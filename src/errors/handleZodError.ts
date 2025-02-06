@@ -1,21 +1,21 @@
-import { ZodError } from 'zod';
+import { Error } from 'mongoose';
 import { IErrorMessage } from '../types/errors.types';
 
-const handleZodError = (error: ZodError) => {
-  console.log(error.errors);
-  const errorMessages: IErrorMessage[] = error.errors.map(el => {
+const handleValidationError = (error: Error.ValidationError) => {
+    const errorMessages: IErrorMessage[] = Object.values(error.errors).map(
+        (el: Error.ValidatorError | Error.CastError) => {
+            return {
+                path: el.path,
+                message: el.message,
+            };
+        }
+    );
+
+    const statusCode = 400;
     return {
-      path: el.path[el.path.length - 1],
-      message: el.message,
+        statusCode,
+        message: 'Validation Error',
+        errorMessages
     };
-  });
-
-  const statusCode = 400;
-  return {
-    statusCode,
-    message: 'Validation Error',
-    errorMessages,
-  };
-};
-
-export default handleZodError;
+}
+export default handleValidationError;
