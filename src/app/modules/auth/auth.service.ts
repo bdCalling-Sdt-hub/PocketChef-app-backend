@@ -351,13 +351,25 @@ const deleteUserFromDB = async (user: JwtPayload, password: string) => {
     return;
 };
 // get all user
-const getAllUserFromDB = async () => {
-    const result = await User.find();
+const getAllUserFromDB = async (name?: string, email?: string) => {
+    let filter: any = {};
+
+    if (name) {
+        filter.name = { $regex: name, $options: "i" };
+    }
+    if (email) {
+        filter.email = { $regex: email, $options: "i" };
+    }
+
+    const result = await User.find(filter);
+
     if (!result || result.length === 0) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "No user found");
     }
     return result;
 };
+
+
 
 // single user get
 const getSingleUserFromDB = async (id: string) => {

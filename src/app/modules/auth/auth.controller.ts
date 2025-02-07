@@ -117,10 +117,10 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.getAllUserFromDB()
-    if (!result) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "No user found")
-    }
+    const { name, email } = req.query;
+
+    const result = await AuthService.getAllUserFromDB(name as string, email as string);
+
     sendResponse(res, {
         success: true,
         Total: result.length,
@@ -128,7 +128,7 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
         message: 'Get All User successfully',
         data: result
     });
-})
+});
 
 // get single user
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
