@@ -2,8 +2,18 @@ export type IRecipes = {
     recipeName: string;
     description: string;
     instructions: [string]
-
-
+    ingredientName: [string];
+    ingredientPrice: number;
+    // level: enum
+    // course: enum
+    // Ingredient: enum
+    // selectByDiet: enum
+    // cookingMethod: enum;
+    totalTime: string;
+    prepTime: string;
+    cookTime: string;
+    tags: [string];
+    imageAndVideo: [string];
 }
 
 
