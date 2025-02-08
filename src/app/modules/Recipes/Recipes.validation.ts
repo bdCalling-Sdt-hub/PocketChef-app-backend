@@ -14,7 +14,8 @@ const createRecipeZodSchema = z.object({
         prepTime: z.number({ required_error: "Prep time is required" }),
         cookTime: z.number({ required_error: "Cook time is required" }),
         tags: z.array(z.string({ required_error: "Tag is required" })).min(1, { message: "At least one tag is required" }),
-        imageAndVideo: z.array(z.string({ required_error: "Image or video URL is required" })).min(1, { message: "At least one image/video is required" }),
+        image: z.array(z.string()).min(1, { message: "At least one image is required" }),
+        video: z.string({ required_error: "Video is required" }),
     })
 });
 

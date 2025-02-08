@@ -1,46 +1,41 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { RecipeController } from "./Recipes.controller";
-import fileUploadHandler from "../../middlewares/fileUploaderHandler";
-import { getMultipleFilesPath } from "../../../shared/getFilePath";
 import { IRecipes } from "./Recipes.interface";
+import fileUploadHandler from "../../middlewares/fileUploaderHandler";
 
-const router = Router()
+const router = Router();
 
 router.post(
-    '/create',
-    fileUploadHandler(),
+    "/create",
+    fileUploadHandler(), // Middleware for handling file uploads
     async (req: Request, res: Response, next: NextFunction) => {
-        console.log("Uploaded files:", req.files); // Log the files to see if they are being received
-
-        // Continue with processing
         try {
             const payload = req.body;
-            const imagesAndVideos: string[] = [
-                ...getMultipleFilesPath(req.files?.['image'], 'image'),
-                ...getMultipleFilesPath(req.files?.['media'], 'media')
-            ];
 
-            const recipeData: IRecipes = {
-                recipeName: payload.recipeName,
-                description: payload.description,
-                instructions: payload.instructions || [],
-                ingredientName: payload.ingredientName,
-                ingredientAmount: payload.ingredientAmount,
-                selectLevel: payload.selectLevel,
-                mealType: payload.mealType,
-                portionSize: payload.portionSize,
-                totalTime: payload.totalTime,
-                prepTime: payload.prepTime,
-                cookTime: payload.cookTime,
-                tags: payload.tags || [],
-                imageAndVideo: imagesAndVideos,
+            // Function to extract file paths
+            const getFilePaths = (files: Express.Multer.File[] | undefined): string[] => {
+                return files ? files.map((file) => file.path) : [];
             };
 
-            req.body = recipeData;
+            // Extract images and videos separately
+            const images = getFilePaths(req.files?.["image"] as Express.Multer.File[]);
+            const videoFiles = getFilePaths(req.files?.["video"] as Express.Multer.File[]);
+
+            // Assign video (if available)
+            const video = videoFiles.length > 0 ? videoFiles[0] : undefined;
+
+            // Convert necessary fields from strings (if needed)
+            const parsedData: Partial<IRecipes> = {
+                ...payload,
+                image: images, // Images array
+                video, // Single video file path or undefined
+            };
+
+            req.body = parsedData;
             next();
         } catch (error) {
             console.error("Error in upload:", error);
-            res.status(500).json({ message: 'Failed to upload files', error });
+            res.status(500).json({ message: "Failed to upload files", error });
         }
     },
     RecipeController.createRecipe

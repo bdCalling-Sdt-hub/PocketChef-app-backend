@@ -23,7 +23,8 @@ const recipeSchema = new Schema<IRecipes>(
         prepTime: { type: Number, required: true },
         cookTime: { type: Number, required: true },
         tags: { type: [String], required: true },
-        imageAndVideo: { type: [String], required: true }
+        image: { type: [String], required: true },
+        video: { type: String, required: true }
     },
     {
         timestamps: true

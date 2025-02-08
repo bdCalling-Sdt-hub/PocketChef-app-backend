@@ -11,5 +11,6 @@ export type IRecipes = {
     prepTime: number;
     cookTime: number;
     tags: string[];
-    imageAndVideo: string[];
+    image: string[]
+    video: string;
 }
