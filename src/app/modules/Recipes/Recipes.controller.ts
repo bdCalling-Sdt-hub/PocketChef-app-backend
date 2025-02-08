@@ -17,8 +17,27 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
     });
 }
 );
+// update recipe for 
+const updateRecipe = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const recipeData = req.body;
+
+    // Pass the files directly from the request to the service
+    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files);
+
+    // Send the response with the updated recipe
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Recipe updated successfully',
+        data: updatedRecipe,
+    });
+});
+
+
 
 
 export const RecipeController = {
-    createRecipe
+    createRecipe,
+    updateRecipe
 }

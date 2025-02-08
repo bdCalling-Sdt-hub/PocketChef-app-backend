@@ -19,4 +19,26 @@ const createRecipeZodSchema = z.object({
     })
 });
 
-export const RecipeValidation = { createRecipeZodSchema };
+
+
+
+const updateRecipeZodSchema = z.object({
+    body: z.object({
+        recipeName: z.string().optional(),
+        description: z.string().optional(),
+        instructions: z.array(z.string()).min(1, { message: "At least one instruction is required" }).optional(),
+        ingredientName: z.string().optional(),
+        ingredientAmount: z.number().optional(),
+        selectLevel: z.enum(["Easy", "Medium", "Hard"]).optional(),
+        mealType: z.enum(["Breakfast", "Lunch", "Dinner"]).optional(),
+        portionSize: z.number().optional(),
+        totalTime: z.number().optional(),
+        prepTime: z.number().optional(),
+        cookTime: z.number().optional(),
+        tags: z.array(z.string()).min(1, { message: "At least one tag is required" }).optional(),
+        image: z.array(z.string()).min(1, { message: "At least one image is required" }).optional(),
+        video: z.string().optional(),
+    })
+});
+
+export const RecipeValidation = { createRecipeZodSchema, updateRecipeZodSchema };

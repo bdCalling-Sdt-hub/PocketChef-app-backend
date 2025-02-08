@@ -52,4 +52,13 @@ router.post(
 );
 
 
+
+// update recipe route
+router.patch(
+    "/update/:id",
+    validateRequest(RecipeValidation.updateRecipeZodSchema),
+    RecipeController.updateRecipe
+);
+
+
 export const RecipeRoutes = router;
