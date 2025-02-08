@@ -2,12 +2,14 @@ import { NextFunction, Request, Response, Router } from "express";
 import { RecipeController } from "./Recipes.controller";
 import { IRecipes } from "./Recipes.interface";
 import fileUploadHandler from "../../middlewares/fileUploaderHandler";
+import { RecipeValidation } from "./Recipes.validation";
+import validateRequest from "../../middlewares/validateRequest";
 
 const router = Router();
 
 router.post(
     "/create",
-    fileUploadHandler(), // Middleware for handling file uploads
+    fileUploadHandler(),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload = req.body;
@@ -20,15 +22,22 @@ router.post(
             // Extract images and videos separately
             const images = getFilePaths(req.files?.["image"] as Express.Multer.File[]);
             const videoFiles = getFilePaths(req.files?.["video"] as Express.Multer.File[]);
-
-            // Assign video (if available)
             const video = videoFiles.length > 0 ? videoFiles[0] : undefined;
-
+            const prepTime = Number(payload.prepTime);
+            const cookTime = Number(payload.cookTime);
+            const totalTime = prepTime + cookTime;
             // Convert necessary fields from strings (if needed)
             const parsedData: Partial<IRecipes> = {
                 ...payload,
-                image: images, // Images array
-                video, // Single video file path or undefined
+                image: images,
+                video,
+                instructions: typeof payload.instructions === "string" ? JSON.parse(payload.instructions) : payload.instructions,
+                tags: typeof payload.tags === "string" ? JSON.parse(payload.tags) : payload.tags,
+                ingredientAmount: Number(payload.ingredientAmount),
+                portionSize: Number(payload.portionSize),
+                totalTime,
+                prepTime,
+                cookTime,
             };
 
             req.body = parsedData;
@@ -38,7 +47,9 @@ router.post(
             res.status(500).json({ message: "Failed to upload files", error });
         }
     },
+    validateRequest(RecipeValidation.createRecipeZodSchema),
     RecipeController.createRecipe
 );
+
 
 export const RecipeRoutes = router;

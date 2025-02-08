@@ -7,7 +7,7 @@ export type IRecipes = {
     selectLevel: "Easy" | "Medium" | "Hard";
     mealType: "Breakfast" | "Lunch" | "Dinner";
     portionSize: number; //number of persons
-    totalTime: number;
+    totalTime?: number;
     prepTime: number;
     cookTime: number;
     tags: string[];
