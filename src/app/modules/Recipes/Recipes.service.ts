@@ -50,7 +50,35 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 
 
 
+// get all recipes
+
+const getAllRecipes = async () => {
+    const recipes = await Recipe.find();
+    if (!recipes) throw new ApiError(StatusCodes.NOT_FOUND, 'No recipes found');
+    return recipes;
+}
+
+const getSingleRecipe = async (id: string) => {
+    const recipe = await Recipe.findById(id);
+    if (!recipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
+    return recipe;
+}
+
+// delete recipe
+
+const deleteRecipeFromDB = async (id: string) => {
+    const recipe = await Recipe.findByIdAndDelete(id);
+    if (!recipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
+    return recipe;
+}
+
+
+
 export const RecipeService = {
     createRecipeIntoDB,
-    updateRecipeIntoDB
+    updateRecipeIntoDB,
+    getAllRecipes,
+    getSingleRecipe,
+    deleteRecipeFromDB,
+
 }

@@ -60,5 +60,16 @@ router.patch(
     RecipeController.updateRecipe
 );
 
+// all recipes route
+router.get("/", RecipeController.getAllRecipe);
+
+// single recipe route
+
+router.get("/:id", RecipeController.getSingleRecipe);
+
+// delete recipe route
+
+router.delete("/:id", RecipeController.deleteRecipe);
+
 
 export const RecipeRoutes = router;

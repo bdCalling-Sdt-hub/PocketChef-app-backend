@@ -35,9 +35,51 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+// all recipes
+const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
+    const result = await RecipeService.getAllRecipes();
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        Total: result.length,
+        success: true,
+        message: 'All Recipes retrieved successfully',
+        data: result,
+    })
+})
+
+// single recipe
+const getSingleRecipe = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await RecipeService.getSingleRecipe(id);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Single Recipe retrieved successfully',
+        data: result,
+    })
+})
+
+
+// delete recipe
+
+const deleteRecipe = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await RecipeService.deleteRecipeFromDB(id);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Recipe deleted successfully',
+        data: result,
+    })
+})
 
 
 export const RecipeController = {
     createRecipe,
-    updateRecipe
+    updateRecipe,
+    getAllRecipe,
+    getSingleRecipe,
+    deleteRecipe,
+
 }
