@@ -3,11 +3,25 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { RecipeService } from "./Recipes.service";
+import ApiError from "../../../errors/ApiErrors";
 
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
+    // 🔹 Ensure `ingredientName` is an array
+    if (typeof recipeData.ingredientName === 'string') {
+        try {
+            recipeData.ingredientName = JSON.parse(recipeData.ingredientName);
+        } catch (error) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid JSON format for ingredientName");
+        }
+    }
 
-    // Recipe creation in database
+    if (!Array.isArray(recipeData.ingredientName)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "ingredientName must be an array");
+    }
+    // calculate total time
+    recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
+
     const result = await RecipeService.createRecipeIntoDB(recipeData);
 
     sendResponse(res, {
@@ -17,6 +31,9 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
         data: result,
     });
 });
+
+
+
 // update recipe for 
 const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;

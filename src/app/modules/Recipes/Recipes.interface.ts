@@ -5,9 +5,6 @@ export type IIngredient = {
 };
 
 
-
-
-
 export type IRecipes = {
     image: string[]
     video: string;
@@ -18,9 +15,9 @@ export type IRecipes = {
     mealType: string;
     keyIngredients: string[];
     dietaryPreferences: string[];
-    totalTime?: number;
     prepTime: number;
     cookTime: number;
+    totalTime?: number;
     instructions: string[];
     ingredientName: IIngredient[];
     tags: string[];

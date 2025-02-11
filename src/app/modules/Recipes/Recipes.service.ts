@@ -28,23 +28,19 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
     const video = files?.["video"] ? files["video"][0].path : payload.video || existingRecipe.video;
 
     // Calculate total time
-    const prepTime = Number(payload.prepTime);
-    const cookTime = Number(payload.cookTime);
-    const totalTime = prepTime + cookTime;
-
+    const prepTime = payload.prepTime ? Number(payload.prepTime) : existingRecipe.prepTime;
+    const cookTime = payload.cookTime ? Number(payload.cookTime) : existingRecipe.cookTime;
     // Prepare the updated payload
     const updatedPayload = {
         ...payload,
         prepTime,
         cookTime,
-        totalTime,
         image: images,
         video,
     };
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(id, updatedPayload, { new: true });
     if (!updatedRecipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
-
     return updatedRecipe;
 };
 

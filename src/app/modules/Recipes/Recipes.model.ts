@@ -1,15 +1,19 @@
 import { model, Schema } from 'mongoose';
 import { IRecipes } from './Recipes.interface';
+
+// Define the ingredient schema properly
 const ingredientSchema = new Schema({
     name: { type: String, required: true },
     amount: { type: Number, required: true },
     unit: { type: String, required: true }
 });
+
+// Define the main recipe schema
 const recipeSchema = new Schema<IRecipes>(
     {
         image: [{ type: String, required: true }],
         video: { type: String, required: false },
-        recipeName: { type: String, required: true, unique: true },
+        recipeName: { type: String, required: true },
         description: { type: String, required: true },
         portionSize: { type: Number, required: true },
         selectLevel: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },

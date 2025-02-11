@@ -12,12 +12,13 @@ const router = Router();
 
 router.post(
     "/create",
+    // validateRequest(RecipeValidation.createRecipeZodSchema),
     fileUploadHandler(),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload = req.body;
             const image = getMultipleFilesPath(req.files, 'image');
-            const video = getSingleFilePath(req.files, "media");
+            const video = getSingleFilePath(req.files, "video");
             req.body = {
                 image,
                 video,
@@ -28,14 +29,14 @@ router.post(
             console.log(error);
         }
     },
-    // validateRequest(RecipeValidation.createRecipeZodSchema),
+
     RecipeController.createRecipe
 );
 
 // update recipe route
 router.patch(
     "/update/:id",
-    validateRequest(RecipeValidation.updateRecipeZodSchema),
+    // validateRequest(RecipeValidation.updateRecipeZodSchema),
     RecipeController.updateRecipe
 );
 
