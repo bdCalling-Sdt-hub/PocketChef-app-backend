@@ -5,18 +5,18 @@ import { StatusCodes } from "http-status-codes";
 import { RecipeService } from "./Recipes.service";
 
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
-    // const result = await NotificationService.getNotificationFromDB(user);
     const recipeData = req.body;
 
+    // Recipe creation in database
     const result = await RecipeService.createRecipeIntoDB(recipeData);
+
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: 'Recipes create Successfully',
+        message: 'Recipe created successfully',
         data: result,
     });
-}
-);
+});
 // update recipe for 
 const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;

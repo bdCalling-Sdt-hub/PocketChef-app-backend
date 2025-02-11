@@ -4,8 +4,11 @@ import { IRecipes } from "./Recipes.interface";
 import fileUploadHandler from "../../middlewares/fileUploaderHandler";
 import { RecipeValidation } from "./Recipes.validation";
 import validateRequest from "../../middlewares/validateRequest";
+import { getMultipleFilesPath, getSingleFilePath } from "../../../shared/getFilePath";
 
 const router = Router();
+
+// create recipe route
 
 router.post(
     "/create",
@@ -13,45 +16,21 @@ router.post(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload = req.body;
-
-            // Function to extract file paths
-            const getFilePaths = (files: Express.Multer.File[] | undefined): string[] => {
-                return files ? files.map((file) => file.path) : [];
-            };
-
-            // Extract images and videos separately
-            const images = getFilePaths(req.files?.["image"] as Express.Multer.File[]);
-            const videoFiles = getFilePaths(req.files?.["video"] as Express.Multer.File[]);
-            const video = videoFiles.length > 0 ? videoFiles[0] : undefined;
-            const prepTime = Number(payload.prepTime);
-            const cookTime = Number(payload.cookTime);
-            const totalTime = prepTime + cookTime;
-            // Convert necessary fields from strings (if needed)
-            const parsedData: Partial<IRecipes> = {
-                ...payload,
-                image: images,
+            const image = getMultipleFilesPath(req.files, 'image');
+            const video = getSingleFilePath(req.files, "media");
+            req.body = {
+                image,
                 video,
-                instructions: typeof payload.instructions === "string" ? JSON.parse(payload.instructions) : payload.instructions,
-                tags: typeof payload.tags === "string" ? JSON.parse(payload.tags) : payload.tags,
-                ingredientAmount: Number(payload.ingredientAmount),
-                portionSize: Number(payload.portionSize),
-                totalTime,
-                prepTime,
-                cookTime,
-            };
-
-            req.body = parsedData;
+                ...payload
+            }
             next();
         } catch (error) {
-            console.error("Error in upload:", error);
-            res.status(500).json({ message: "Failed to upload files", error });
+            console.log(error);
         }
     },
-    validateRequest(RecipeValidation.createRecipeZodSchema),
+    // validateRequest(RecipeValidation.createRecipeZodSchema),
     RecipeController.createRecipe
 );
-
-
 
 // update recipe route
 router.patch(
