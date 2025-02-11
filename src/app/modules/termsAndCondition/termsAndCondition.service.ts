@@ -29,7 +29,11 @@ const updateTermsAndCondition = async (id: string, payload: ITermsAndCondition):
 // delete terms and condition
 
 const deleteTermsAndCondition = async (id: string): Promise<void> => {
-    await termsAndConditionModel.findByIdAndDelete(id);
+    const termsAndConditionData = await termsAndConditionModel.findByIdAndDelete(id);
+    if (!termsAndConditionData) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Terms and Condition not found');
+    }
+    return termsAndConditionData;
 };
 
 // get terms and condition
