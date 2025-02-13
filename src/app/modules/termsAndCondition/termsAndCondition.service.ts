@@ -33,7 +33,7 @@ const deleteTermsAndCondition = async (id: string): Promise<void> => {
     if (!termsAndConditionData) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Terms and Condition not found');
     }
-    return termsAndConditionData;
+    // termsAndConditionData is deleted successfully
 };
 
 // get terms and condition
