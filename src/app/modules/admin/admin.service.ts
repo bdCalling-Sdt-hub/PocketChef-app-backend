@@ -63,5 +63,6 @@ const getAllNewUser = async (filter: IFilter['filter']): Promise<IUser[]> => {
 export const AdminService = {
     createAdminToDB,
     deleteAdminFromDB,
-    getAdminFromDB
+    getAdminFromDB,
+    getAllNewUser
 };

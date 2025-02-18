@@ -25,4 +25,6 @@ router.delete(
     AdminController.deleteAdmin
 );
 
+router.get("/new", AdminController.getNewUserFromDB)
+
 export const AdminRoutes = router;

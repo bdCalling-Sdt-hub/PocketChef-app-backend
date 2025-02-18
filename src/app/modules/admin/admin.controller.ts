@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AdminService } from './admin.service';
+import ApiError from '../../../errors/ApiErrors';
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
@@ -41,8 +42,31 @@ const getAdmin = catchAsync(async (req: Request, res: Response) => {
 
 });
 
+// get all new users base on filter for supper admin
+
+const getNewUserFromDB = catchAsync(async (req: Request, res: Response) => {
+    const { filter } = req.query;
+    if (!filter || !["weekly", "monthly", "yearly"].includes(filter as string)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid filter");
+    }
+    const result = await AdminService.getAllNewUser(filter as "weekly" | "monthly" | "yearly");
+    if (!result) {
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get new users");
+    }
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'New Users Retrieved Successfully',
+        data: result
+    })
+})
+
+
+
+
 export const AdminController = {
     deleteAdmin,
     createAdmin,
-    getAdmin
+    getAdmin,
+    getNewUserFromDB
 };
