@@ -7,8 +7,9 @@ import { User } from '../user/user.model';
 import ApiError from '../../../errors/ApiErrors';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
-    const { ...verifyData } = req.body;
-    const result = await AuthService.verifyEmailToDB(verifyData);
+    const { email, oneTimeCode } = req.body;
+
+    const result = await AuthService.verifyEmailToDB({ email, oneTimeCode });
 
     sendResponse(res, {
         success: true,
@@ -22,14 +23,18 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 const loginUser = catchAsync(async (req: Request, res: Response) => {
     const { ...loginData } = req.body;
     const result = await AuthService.loginUserFromDB(loginData);
-
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
-        message: 'User login successfully',
-        data: result
+        message: 'User logged in successfully.',
+        data: {
+            token: result.accessToken,
+            role: result.role
+        },
     });
 });
+
+
 
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     const email = req.body.email;
@@ -146,6 +151,16 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const verifyOTP = catchAsync(async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+    const result = await AuthService.verifyOTP(email, otp);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+    });
+});
 
 
 
@@ -161,5 +176,6 @@ export const AuthController = {
     socialLogin,
     deleteUser,
     getAllUser,
-    getSingleUser
+    getSingleUser,
+    verifyOTP
 };

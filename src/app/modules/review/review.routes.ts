@@ -11,13 +11,12 @@ router.post("/",
     validateRequest(ReviewValidation.reviewZodSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const {rating, ...othersData } = req.body;
+            const { rating, ...othersData } = req.body;
 
-            req.body = { ...othersData, customer: req.user.id, rating: Number(rating)};
+            req.body = { ...othersData, customer: req.user.id, rating: Number(rating) };
             next();
 
         } catch (error) {
-            console.log(error)
             return res.status(500).json({ message: "Failed to convert string to number" });
         }
     },

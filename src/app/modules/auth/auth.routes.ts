@@ -102,5 +102,7 @@ router.get("/users",
     // auth(USER_ROLES.SUPER_ADMIN),
     AuthController.getAllUser)
 router.get("/user/:id", AuthController.getSingleUser);
+// otp verification
+
 
 export const AuthRoutes = router;

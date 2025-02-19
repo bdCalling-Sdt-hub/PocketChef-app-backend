@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser, UserModal>(
         role: {
             type: String,
             enum: Object.values(USER_ROLES),
-            required: true,
+            // required: true,
         },
         email: {
             type: String,
@@ -49,13 +49,9 @@ const userSchema = new Schema<IUser, UserModal>(
             type: Boolean,
             default: false,
         },
-        createdAt: {
-            type: Date,
-            default: Date.now,
-        },
-        lastLogin: {
-            type: Date,
-            default: Date.now,
+        userBan: {
+            type: Boolean,
+            default: false,
         },
         authentication: {
             type: {
@@ -119,15 +115,42 @@ userSchema.statics.isMatchPassword = async (password: string, hashPassword: stri
 };
 
 //check user
+// userSchema.pre('save', async function (next) {
+//     //check user
+//     const isExist = await User.findOne({ email: this.email });
+//     if (isExist) {
+//         throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+//     }
+
+//     //password hash
+//     this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+//     next();
+// });
 userSchema.pre('save', async function (next) {
-    //check user
-    const isExist = await User.findOne({ email: this.email });
-    if (isExist) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+    if (this.isNew || this.isModified('email')) {
+        const existingUser = await User.findOne({ email: this.email });
+        if (existingUser) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!');
+        }
     }
 
-    //password hash
-    this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+    // Hash password if it's modified or new
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+    }
+
+    // Default verification status as false for new users
+    if (this.isNew) {
+        this.verified = false; // Ensure the user is not verified initially
+    }
+
     next();
 });
+
+
+
+
+
+
+
 export const User = model<IUser, UserModal>("User", userSchema)

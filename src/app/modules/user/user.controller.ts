@@ -5,16 +5,19 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 
 // register user
-const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData);
+const createUser = catchAsync(
+    async (req: Request, res: Response) => {
+        const { ...userData } = req.body;
+        const result = await UserService.createUserToDB(userData);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Your account has been successfully created. Verify Your Email By OTP. Check your email',
-    })
-});
+        sendResponse(res, {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: 'User created successfully please check your email for verification code.',
+            data: result,
+        });
+    }
+);
 
 // register admin
 const createAdmin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -64,10 +67,26 @@ const updateProfile = catchAsync(async (req: Request, res: Response, next: NextF
         data: result
     });
 });
+const verifyOtp = catchAsync(async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+
+
+    const result = await UserService.verifyOtp(email, otp);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "OTP verified successfully",
+        data: result,
+    });
+});
+
+
 
 export const UserController = {
     createUser,
     createAdmin,
     getUserProfile,
-    updateProfile
+    updateProfile,
+    verifyOtp
 };

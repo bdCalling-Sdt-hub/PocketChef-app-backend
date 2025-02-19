@@ -79,7 +79,20 @@ const getUserEngagement = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
-
+// ban user from db
+const banUser = catchAsync(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const result = await AdminService.banUserFromDB(userId);
+    if (!result) {
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to ban user");
+    }
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'User Banned Successfully',
+        data: result
+    })
+})
 
 
 export const AdminController = {
@@ -88,4 +101,5 @@ export const AdminController = {
     getAdmin,
     getNewUserFromDB,
     getUserEngagement,
+    banUser
 };

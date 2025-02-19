@@ -29,5 +29,5 @@ router
 //     fileUploadHandler(),
 //     UserController.updateProfile
 // );
-
+router.route("/verify-otp").post(UserController.verifyOtp);
 export const UserRoutes = router;

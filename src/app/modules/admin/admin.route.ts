@@ -28,5 +28,8 @@ router.delete(
 router.get("/new", AdminController.getNewUserFromDB)
 router.get("/engagement", AdminController.getUserEngagement);
 
+// ban user from admin
+router.patch('/ban/:id', auth(USER_ROLES.SUPER_ADMIN), AdminController.banUser);
+
 
 export const AdminRoutes = router;

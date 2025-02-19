@@ -26,8 +26,7 @@ export type IUser = {
     verified: boolean;
     authentication?: IAuthenticationProps;
     accountInformation?: IStripeAccountInfo;
-    createdAt?: Date;
-    lastLogin?: Date;
+    userBan?: boolean
 }
 
 export type UserModal = {

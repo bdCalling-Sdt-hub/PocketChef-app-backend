@@ -97,7 +97,14 @@ const getActiveUsers = async (period: 'daily' | 'weekly' | 'monthly' | 'yearly')
     };
 };
 
-
+// user ban service single user 
+const banUserFromDB = async (id: any): Promise<IUser | undefined> => {
+    const isExistUser = await User.findByIdAndUpdate(id, { userBan: true }, { new: true });
+    if (!isExistUser) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to ban user');
+    }
+    return isExistUser;
+};
 
 
 export const AdminService = {
@@ -106,4 +113,5 @@ export const AdminService = {
     getAdminFromDB,
     getAllNewUser,
     getActiveUsers,
+    banUserFromDB
 };
