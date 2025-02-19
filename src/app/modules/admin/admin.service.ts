@@ -60,9 +60,50 @@ const getAllNewUser = async (filter: IFilter['filter']): Promise<IUser[]> => {
     return users;
 };
 
+
+// get active user 
+interface IActiveUsers {
+    period: string;
+    count: number;
+    users: IUser[];
+}
+
+const getActiveUsers = async (period: 'daily' | 'weekly' | 'monthly' | 'yearly'): Promise<IActiveUsers> => {
+    let startDate: Date;
+    const now = new Date();
+
+    if (period === 'daily') {
+        startDate = new Date();
+        startDate.setDate(now.getDate() - 1);
+    } else if (period === 'weekly') {
+        startDate = new Date();
+        startDate.setDate(now.getDate() - 7);
+    } else if (period === 'monthly') {
+        startDate = new Date();
+        startDate.setMonth(now.getMonth() - 1);
+    } else if (period === 'yearly') {
+        startDate = new Date();
+        startDate.setFullYear(now.getFullYear() - 1);
+    } else {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid period type');
+    }
+
+    const users: IUser[] = await User.find({ lastLogin: { $gte: startDate } });
+
+    return {
+        period,
+        count: users.length,
+        users
+    };
+};
+
+
+
+
 export const AdminService = {
     createAdminToDB,
     deleteAdminFromDB,
     getAdminFromDB,
-    getAllNewUser
+    getAllNewUser,
+    getActiveUsers,
 };

@@ -26,5 +26,7 @@ router.delete(
 );
 
 router.get("/new", AdminController.getNewUserFromDB)
+router.get("/engagement", AdminController.getUserEngagement);
+
 
 export const AdminRoutes = router;

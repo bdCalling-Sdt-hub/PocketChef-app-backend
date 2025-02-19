@@ -61,6 +61,24 @@ const getNewUserFromDB = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+// get active user 
+const getUserEngagement = catchAsync(async (req: Request, res: Response) => {
+    const { period } = req.query;
+    if (!period || !["daily", "weekly", "monthly", "yearly"].includes(period as string)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid period");
+    }
+    const engagementData = await AdminService.getActiveUsers(period)
+    if (!engagementData) {
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get user engagement");
+    }
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'User Engagement Retrieved Successfully',
+        data: engagementData
+    })
+})
+
 
 
 
@@ -68,5 +86,6 @@ export const AdminController = {
     deleteAdmin,
     createAdmin,
     getAdmin,
-    getNewUserFromDB
+    getNewUserFromDB,
+    getUserEngagement,
 };
