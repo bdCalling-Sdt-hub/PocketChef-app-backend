@@ -42,8 +42,8 @@ const recipeSchema = new Schema<IRecipes>(
         instructions: [{ type: String, required: true }],
         ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
-        favorite: [favoriteSchema],
-        review: [reviewSchema]
+        // favorite: [favoriteSchema],
+        // review: [reviewSchema]
     },
     {
         timestamps: true

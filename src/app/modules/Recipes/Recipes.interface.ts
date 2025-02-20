@@ -32,6 +32,6 @@ export type IRecipes = {
     instructions: string[];
     ingredientName: IIngredient[];
     tags: string[];
-    favorite?: IFavorite[]
-    review?: IReview[]
+    // favorite?: IFavorite[]
+    // review?: IReview[]
 }
