@@ -104,7 +104,7 @@ router.get("/users",
 router.get("/user/:id", AuthController.getSingleUser);
 // ban user 
 router.patch('/ban/:id',
-    //  auth(USER_ROLES.SUPER_ADMIN),
+    auth(USER_ROLES.SUPER_ADMIN),
     AuthController.banUser);
 
 
