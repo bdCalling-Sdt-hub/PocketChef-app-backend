@@ -54,10 +54,16 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
 
 // all recipes
 const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
-    const result = await RecipeService.getAllRecipes();
+    const paginationOptions = {
+        page: Number(req.query.page),
+        limit: Number(req.query.limit),
+        sortBy: req.query.sortBy as string,
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
+    }
+    const result = await RecipeService.getAllRecipes(paginationOptions);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
-        Total: result.length,
+        Total: result.data.length,
         success: true,
         message: 'All Recipes retrieved successfully',
         data: result,

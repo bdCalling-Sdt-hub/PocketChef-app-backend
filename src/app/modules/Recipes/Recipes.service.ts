@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes"
 import ApiError from "../../../errors/ApiErrors"
 import { IRecipes } from "./Recipes.interface"
 import { Recipe } from "./Recipes.model"
+import { IPaginationOptions, paginationHelper } from "../../../helpers/paginationHelper"
 
 const createRecipeIntoDB = async (payload: IRecipes) => {
 
@@ -48,10 +49,19 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 
 // get all recipes
 
-const getAllRecipes = async () => {
-    const recipes = await Recipe.find();
-    if (!recipes) throw new ApiError(StatusCodes.NOT_FOUND, 'No recipes found');
-    return recipes;
+const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions)
+    const recipes = await Recipe.find().sort({ [sortBy]: sortOrder }).skip(skip).limit(limit)
+    const total = await Recipe.countDocuments()
+    if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
+    return {
+        meta: {
+            page,
+            limit,
+            total
+        },
+        data: recipes
+    }
 }
 
 const getSingleRecipe = async (id: string) => {
