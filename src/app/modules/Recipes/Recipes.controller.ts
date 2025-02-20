@@ -40,7 +40,7 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
 
     // Pass the files directly from the request to the service
-    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files);
+    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as File[]);
 
     // Send the response with the updated recipe
     sendResponse(res, {
