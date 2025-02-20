@@ -11,12 +11,16 @@ const createRequestRecipe = async (payload: IRequestRecipes) => {
     return result
 }
 
-const updateRequestRecipeZodSchema = async (payload: IRequestRecipes) => {
-    const result = await RequestRecipe.findOneAndUpdate(payload)
+const updateRequestRecipeZodSchema = async (id: string, payload: Partial<IRequestRecipes>) => {
+    const result = await RequestRecipe.findByIdAndUpdate(
+        id,
+        payload,
+        { new: true }
+    );
     if (!result) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update request recipe')
     }
-    return result
+    return result;
 }
 
 

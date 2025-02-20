@@ -8,7 +8,7 @@ const requestRecipes = new Schema<IRequestRecipes>(
             required: true,
             ref: 'User'
         },
-        ingredients: {
+        RequestRecipeBody: {
             type: String,
             required: true
         }
@@ -18,4 +18,4 @@ const requestRecipes = new Schema<IRequestRecipes>(
     }
 )
 
-export const RequestRecipe = model<IRequestRecipes>("requestReciPes", requestRecipes)
+export const RequestRecipe = model<IRequestRecipes>("requestRecipes", requestRecipes)
