@@ -8,6 +8,22 @@ const ingredientSchema = new Schema({
     unit: { type: String, required: true }
 });
 
+// like schema
+const favoriteSchema = new Schema({
+    userId: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now }
+});
+
+
+// comment schema
+const reviewSchema = new Schema({
+    userId: { type: String, required: true },
+    username: { type: String, required: true },
+    text: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    replies: [{ type: Schema.Types.Mixed }]
+});
+
 // Define the main recipe schema
 const recipeSchema = new Schema<IRecipes>(
     {
@@ -25,7 +41,9 @@ const recipeSchema = new Schema<IRecipes>(
         cookTime: { type: Number, required: true },
         instructions: [{ type: String, required: true }],
         ingredientName: [ingredientSchema],
-        tags: [{ type: String, required: false }]
+        tags: [{ type: String, required: false }],
+        favorite: [favoriteSchema],
+        review: [reviewSchema]
     },
     {
         timestamps: true

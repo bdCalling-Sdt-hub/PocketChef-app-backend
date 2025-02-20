@@ -137,7 +137,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
 //forget password
 const resetPasswordToDB = async (token: string, payload: IAuthResetPassword) => {
 
-    const { newPassword, confirmPassword } = payload;
+    const { newPassword } = payload;
 
     //isExist token
     const isExistToken = await ResetToken.isExistToken(token);
@@ -158,9 +158,9 @@ const resetPasswordToDB = async (token: string, payload: IAuthResetPassword) => 
     }
 
     //check password
-    if (newPassword !== confirmPassword) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "New password and Confirm password doesn't match!");
-    }
+    // if (newPassword !== confirmPassword) {
+    //     throw new ApiError(StatusCodes.BAD_REQUEST, "New password and Confirm password doesn't match!");
+    // }
 
     const hashPassword = await bcrypt.hash(newPassword, Number(config.bcrypt_salt_rounds));
 
@@ -197,9 +197,9 @@ const changePasswordToDB = async (user: JwtPayload, payload: IChangePassword) =>
     }
 
     //new password and confirm password check
-    if (newPassword !== confirmPassword) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Password and Confirm password doesn't matched");
-    }
+    // if (newPassword !== confirmPassword) {
+    //     throw new ApiError(StatusCodes.BAD_REQUEST, "Password and Confirm password doesn't matched");
+    // }
 
     //hash password
     const hashPassword = await bcrypt.hash(newPassword, Number(config.bcrypt_salt_rounds));

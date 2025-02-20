@@ -11,7 +11,7 @@ const requestRecipes = new Schema<IRequestRecipes>(
         RequestRecipeBody: {
             type: String,
             required: true
-        }
+        },
     },
     {
         timestamps: true
