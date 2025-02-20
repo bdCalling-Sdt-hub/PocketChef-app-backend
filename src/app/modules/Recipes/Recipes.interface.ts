@@ -3,7 +3,17 @@ export type IIngredient = {
     amount: number;
     unit: string;
 };
-
+export type ILike = {
+    userId: string; // User who liked
+    timestamp: Date; // When the like was made
+};
+export type IComment = {
+    userId: string;
+    username: string;
+    text: string;
+    timestamp: Date;
+    replies?: IComment[];
+};
 
 export type IRecipes = {
     image: string[]
@@ -21,4 +31,6 @@ export type IRecipes = {
     instructions: string[];
     ingredientName: IIngredient[];
     tags: string[];
+    like?: ILike[]
+    comment?: IComment[]
 }
