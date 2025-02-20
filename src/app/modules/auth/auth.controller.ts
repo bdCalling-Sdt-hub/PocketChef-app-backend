@@ -162,7 +162,18 @@ const verifyOTP = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ban user from admin
+const banUser = catchAsync(async (req: Request, res: Response) => {
+    const user = await req.params.id;
+    const result = await AuthService.banUserIntoDB(user);
 
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'User Banned successfully',
+        data: result
+    });
+});
 
 
 export const AuthController = {
@@ -177,5 +188,6 @@ export const AuthController = {
     deleteUser,
     getAllUser,
     getSingleUser,
-    verifyOTP
+    verifyOTP,
+    banUser,
 };

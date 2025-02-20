@@ -379,7 +379,7 @@ const getSingleUserFromDB = async (id: string) => {
 }
 
 // otp verification
-const verifyOTP = async (email, otp) => {
+const verifyOTP = async (email: string, otp: number) => {
     const user = await User.findOne({ email }).select('+authentication');
 
     if (!user) {
@@ -408,6 +408,16 @@ const verifyOTP = async (email, otp) => {
     return { message: 'Email verified successfully!' };
 };
 
+// ban user from admin account 
+const banUserIntoDB = async (user: string) => {
+    const userId = await User.findByIdAndUpdate(user);
+    if (!userId) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User not found");
+    }
+    const result = await User.findByIdAndUpdate(user, { userBan: true });
+    return result
+}
+
 
 export const AuthService = {
     verifyEmailToDB,
@@ -421,5 +431,6 @@ export const AuthService = {
     deleteUserFromDB,
     getAllUserFromDB,
     getSingleUserFromDB,
-    verifyOTP
+    verifyOTP,
+    banUserIntoDB
 };
