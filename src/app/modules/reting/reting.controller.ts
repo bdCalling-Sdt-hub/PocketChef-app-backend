@@ -6,17 +6,25 @@ import { StatusCodes } from 'http-status-codes';
 import sendResponse from '../../../shared/sendResponse';
 
 const createReting = catchAsync(async (req: Request, res: Response) => {
-    const result = req.body
-    const reting = await RetingServices.createRetingIntoDB(result);
-    if (!reting) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Reting')
+
+    if (!req.user) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "You are not authorized");
     }
-    sendResponse(res, ({
+
+    const { star, comment } = req.body;
+    const retingData = { userId: req.user?.id, star, comment };
+
+    const reting = await RetingServices.createRetingIntoDB(retingData);
+    if (!reting) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create Rating");
+    }
+
+    sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: 'Reting created successfully',
-        data: reting
-    }))
+        message: "Rating created successfully",
+        data: reting,
+    });
 })
 
 
