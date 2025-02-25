@@ -1,7 +1,7 @@
 import { Schema, Types, model } from 'mongoose';
-import { IReting, RetingModel } from './reting.interface';
+import { IRating, ratingModel } from './rating.interface';
 
-const retingSchema = new Schema<IReting, RetingModel>({
+const ratingSchema = new Schema<IRating, ratingModel>({
   star: {
     type: Number,
     required: true,
@@ -22,4 +22,4 @@ const retingSchema = new Schema<IReting, RetingModel>({
   }
 });
 
-export const Reting = model<IReting, RetingModel>('Reting', retingSchema);
+export const rating = model<IRating, ratingModel>('rating', ratingSchema);

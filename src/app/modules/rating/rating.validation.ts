@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const createRetingZodSchema = z.object({
+const createRatingZodSchema = z.object({
     body: z.object({
         star: z.number({
             required_error: 'Star is required',
@@ -19,6 +19,6 @@ const createRetingZodSchema = z.object({
 
 
 
-export const RetingValidations = {
-    createRetingZodSchema
+export const ratingValidations = {
+    createRatingZodSchema
 };
