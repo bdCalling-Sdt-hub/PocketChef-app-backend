@@ -37,6 +37,10 @@ const userSchema = new Schema<IUser, UserModal>(
             select: 0,
             minlength: 8,
         },
+        confirmPassword: {
+            type: String,
+            required: true
+        },
         location: {
             type: String,
             required: false,

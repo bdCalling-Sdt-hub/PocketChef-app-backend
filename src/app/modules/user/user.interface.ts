@@ -21,6 +21,7 @@ export type IUser = {
     contact: string;
     email: string;
     password: string;
+    confirmPassword: string
     location: string;
     profile: string;
     verified: boolean;

@@ -7,7 +7,6 @@ import ApiError from "../../../errors/ApiErrors";
 
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
-    // 🔹 Ensure `ingredientName` is an array
     if (typeof recipeData.ingredientName === 'string') {
         try {
             recipeData.ingredientName = JSON.parse(recipeData.ingredientName);
@@ -40,7 +39,7 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
 
     // Pass the files directly from the request to the service
-    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as File[]);
+    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as Express.Multer.File[]);
 
     // Send the response with the updated recipe
     sendResponse(res, {
