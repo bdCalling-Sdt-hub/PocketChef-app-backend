@@ -26,6 +26,9 @@ const fileUploadHandler = () => {
                 case 'video':
                     uploadDir = path.join(baseUploadDir, 'videos');
                     break;
+                case "profile":
+                    uploadDir = path.join(baseUploadDir, 'profiles');
+                    break;
                 default:
                     return cb(new Error('File type is not supported'), '');
             }
@@ -47,24 +50,31 @@ const fileUploadHandler = () => {
     });
 
     const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/vnd.microsoft.icon'];
         const allowedVideoTypes = ['video/mp4', 'video/mkv', 'video/avi'];
+
+
 
         if (file.fieldname === 'image' && allowedImageTypes.includes(file.mimetype)) {
             cb(null, true);
         } else if (file.fieldname === 'video' && allowedVideoTypes.includes(file.mimetype)) {
             cb(null, true);
+        } else if (file.fieldname === 'profile' && allowedImageTypes.includes(file.mimetype)) {
+            cb(null, true);
         } else {
-            cb(new Error('Only .jpeg, .png, .jpg for images & .mp4, .mkv, .avi for videos are supported'), false);
+            cb(null, false);
         }
     };
 
+
+
     return multer({
         storage,
-        fileFilter
+        fileFilter: fileFilter as unknown as multer.Options['fileFilter']
     }).fields([
         { name: 'image', maxCount: 3 },
-        { name: 'video', maxCount: 2 }
+        { name: 'video', maxCount: 2 },
+        { name: 'profile', maxCount: 1 }
     ]);
 };
 

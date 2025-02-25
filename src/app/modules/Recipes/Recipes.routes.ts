@@ -12,26 +12,32 @@ const router = Router();
 
 router.post(
     "/create",
-    // validateRequest(RecipeValidation.createRecipeZodSchema),
-    fileUploadHandler(),
+    fileUploadHandler() as any,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
+
+            if (!req.files) {
+                throw new Error('No files uploaded');
+            }
+
             const payload = req.body;
             const image = getMultipleFilesPath(req.files, 'image');
-            const video = getSingleFilePath(req.files, "video");
+            const video = getSingleFilePath(req.files, 'video' as any);
+
             req.body = {
                 image,
                 video,
                 ...payload
-            }
+            };
+
             next();
         } catch (error) {
-            console.log(error);
+            res.status(400).json({ error: error });
         }
     },
-
     RecipeController.createRecipe
 );
+
 
 // update recipe route
 router.patch(

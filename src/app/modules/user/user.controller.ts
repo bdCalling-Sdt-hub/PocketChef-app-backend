@@ -35,7 +35,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response, next: NextFun
 // retrieved user profile
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
     const user = req.user;
-    const result = await UserService.getUserProfileFromDB(user);
+    const result = await UserService.getUserProfileFromDB(user as any);
 
     sendResponse(res, {
         success: true,
@@ -47,26 +47,41 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
 
 //update profile
 const updateProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
+    try {
+        const user = req.user as any;
 
-    let profile;
-    if (req.files && 'image' in req.files && req.files.image[0]) {
-        profile = `/images/${req.files.image[0].filename}`;
+        const previousFiles = req.files;
+
+        const updateData: any = {
+            name: req.body.name,
+            contact: req.body.contact,
+            location: req.body.location,
+        };
+
+        if (req.files && typeof req.files === 'object' && 'profile' in req.files) {
+            updateData.profile = req.files.profile[0].path;
+        }
+
+        const result = await UserService.updateProfileToDB(user, updateData);
+
+        // আগের ফাইল রিস্টোর করা হচ্ছে
+        req.files = previousFiles;
+
+        sendResponse(res, {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: 'Profile updated successfully',
+            data: result,
+        });
+    } catch (error) {
+        next(error);
     }
-
-    const data = {
-        profile,
-        ...req.body,
-    };
-    const result = await UserService.updateProfileToDB(user, data);
-
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Profile updated successfully',
-        data: result
-    });
 });
+
+
+
+
+
 const verifyOtp = catchAsync(async (req: Request, res: Response) => {
     const { email, otp } = req.body;
 

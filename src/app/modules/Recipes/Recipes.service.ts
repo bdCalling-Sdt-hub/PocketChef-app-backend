@@ -23,10 +23,10 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
     };
 
     // If no new images are uploaded, retain the old images
-    const images = files?.["image"] ? getFilePaths(files["image"] as Express.Multer.File[]) : existingRecipe.image;
+    const images = files && 'image' in files ? getFilePaths(files['image'] as Express.Multer.File[]) : existingRecipe.image;
 
     // Handle video (if present), retain the old video if no new one is uploaded
-    const video = files?.["video"] ? files["video"][0].path : payload.video || existingRecipe.video;
+    const video = files && 'video' in files ? (files['video'] as Express.Multer.File[])[0].path : payload.video || existingRecipe.video;
 
     // Calculate total time
     const prepTime = payload.prepTime ? Number(payload.prepTime) : existingRecipe.prepTime;
@@ -54,6 +54,7 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
 
     const recipes = await Recipe.aggregate([
         {
+            // start matching with recipe collection
             $lookup: {
                 from: "ratings",
                 localField: "_id", // Recipe _id
