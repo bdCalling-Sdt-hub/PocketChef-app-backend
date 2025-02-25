@@ -50,19 +50,14 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 // get all recipes
 
 const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
-    const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions)
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
+
     const recipes = await Recipe.aggregate([
         {
-
-            // start connection with rating collection
             $lookup: {
-                // where it take from
                 from: "ratings",
-                // local Field means which field is match
-                localField: "_id",
-                // foreign Field means which field is match
-                foreignField: "recipeId",
-                // as means where it store
+                localField: "_id", // Recipe _id
+                foreignField: "recipeId", // Rating recipeId
                 as: "ratings"
             }
         },
@@ -70,12 +65,14 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
             $addFields: {
                 averageRating: {
                     $cond: {
-                        if: { $gt: [{ $size: "$ratings" }, 0] }, // Check if ratings exist
-                        then: { $avg: "$ratings.star" }, // Calculate the average
+                        if: { $gt: [{ $size: "$ratings" }, 0] }, // If there are ratings
+                        then: {
+                            $avg: "$ratings.star" // Average of the 'star' field in ratings
+                        },
                         else: 0
                     }
                 },
-                totalRatings: { $size: { $ifNull: ["$ratings", []] } } // Ensure array exists before counting
+                totalRatings: { $size: "$ratings" } // Count total ratings
             }
         },
         {
@@ -87,9 +84,12 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
         {
             $limit: limit
         }
-    ])
-    const total = await Recipe.countDocuments()
+    ]);
+
+
+    const total = await Recipe.countDocuments();
     if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
+
     return {
         meta: {
             page,
@@ -97,8 +97,12 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
             total
         },
         data: recipes
-    }
-}
+    };
+};
+
+
+
+
 
 const getSingleRecipe = async (id: string) => {
     const recipe = await Recipe.findById(id);
