@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
-import { User } from '../user/user.model';
 import ApiError from '../../../errors/ApiErrors';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
@@ -15,7 +14,7 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
         success: true,
         statusCode: StatusCodes.OK,
         message: result.message,
-        data: result.data,
+        data: result,
     });
 });
 
@@ -62,7 +61,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user;
+    const user: any = req.user;
     const { ...passwordData } = req.body;
     await AuthService.changePasswordToDB(user, passwordData);
 
