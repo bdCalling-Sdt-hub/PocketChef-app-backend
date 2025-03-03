@@ -8,9 +8,7 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
   const serviceData = req.body;
 
   let category = "";
-  // if (req.files && "category" in req.files && req.files.category[0]) {
-  //   category = `/category/${req.files.image[0].filename}`;
-  // }
+
   if (req.files && "category" in req.files && Array.isArray(req.files.category) && req.files.category.length > 0) {
     category = `/category/${req.files.category[0].filename}`;
   }

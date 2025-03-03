@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 
 export type IIngredient = {
     name: string;
@@ -23,7 +24,7 @@ export type IRecipes = {
     description: string;
     portionSize: number;
     selectLevel: "Easy" | "Medium" | "Hard";
-    mealType: string;
+    mealType: Types.ObjectId;
     keyIngredients: string[];
     dietaryPreferences: string[];
     prepTime: number;

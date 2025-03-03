@@ -58,13 +58,12 @@ const updateProfile = catchAsync(async (req: Request, res: Response, next: NextF
             location: req.body.location,
         };
 
-        if (req.files && typeof req.files === 'object' && 'profile' in req.files) {
-            updateData.profile = req.files.profile[0].path;
+        if (req.files && typeof req.files === 'object' && 'profile' in req.files && Array.isArray(req.files.profile) && req.files.profile.length > 0) {
+            updateData.profile = `/profiles/${req.files.profile[0].filename}`;
         }
 
         const result = await UserService.updateProfileToDB(user, updateData);
 
-        // আগের ফাইল রিস্টোর করা হচ্ছে
         req.files = previousFiles;
 
         sendResponse(res, {

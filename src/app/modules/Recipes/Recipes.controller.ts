@@ -7,18 +7,32 @@ import ApiError from "../../../errors/ApiErrors";
 
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
-    if (typeof recipeData.ingredientName === 'string') {
-        try {
-            recipeData.ingredientName = JSON.parse(recipeData.ingredientName);
-        } catch (error) {
-            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid JSON format for ingredientName");
-        }
-    }
 
-    if (!Array.isArray(recipeData.ingredientName)) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "ingredientName must be an array");
-    }
-    // calculate total time
+    const parseArrayField = (field: any, fieldName: string) => {
+        if (typeof field === "string") {
+            const trimmedField = field.trim();
+
+            if (trimmedField.startsWith("[") && trimmedField.endsWith("]")) {
+                try {
+                    return JSON.parse(trimmedField);
+                } catch (error) {
+                    console.warn(`Invalid JSON format for ${fieldName}:`, trimmedField);
+                    throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid JSON format for ${fieldName}`);
+                }
+            }
+            return trimmedField.split(",").map((item) => item.trim().replace(/^"(.*)"$/, "$1"));
+        }
+
+        return Array.isArray(field) ? field : [];
+    };
+
+
+    recipeData.ingredientName = parseArrayField(recipeData.ingredientName, "ingredientName");
+    recipeData.keyIngredients = parseArrayField(recipeData.keyIngredients, "keyIngredients");
+    recipeData.dietaryPreferences = parseArrayField(recipeData.dietaryPreferences, "dietaryPreferences");
+    recipeData.tags = parseArrayField(recipeData.tags, "tags");
+    recipeData.instructions = parseArrayField(recipeData.instructions, "instructions");
+
     recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
 
     const result = await RecipeService.createRecipeIntoDB(recipeData);
@@ -26,10 +40,13 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: 'Recipe created successfully',
+        message: "Recipe created successfully",
         data: result,
-    });
+    })
 });
+
+
+
 
 
 
@@ -37,7 +54,9 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
 const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;
     const recipeData = req.body;
-
+    if (recipeData.prepTime || recipeData.cookTime) {
+        recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
+    }
     // Pass the files directly from the request to the service
     const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as Express.Multer.File[]);
 

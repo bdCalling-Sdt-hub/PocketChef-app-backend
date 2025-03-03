@@ -33,7 +33,7 @@ const recipeSchema = new Schema<IRecipes>(
         description: { type: String, required: true },
         portionSize: { type: Number, required: true },
         selectLevel: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
-        mealType: { type: String, required: true },
+        mealType: { type: Schema.Types.ObjectId, ref: "Category", required: true },
         keyIngredients: [{ type: String, required: true }],
         dietaryPreferences: [{ type: String, required: false }],
         totalTime: { type: Number, required: false },
