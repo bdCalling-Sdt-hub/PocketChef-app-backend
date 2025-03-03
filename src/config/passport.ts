@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "https://nadir.binarybards.online/api/v1/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        
+
         console.log(profile)
         done(null, profile);
     } catch (error) {
@@ -36,7 +36,6 @@ passport.use(new FacebookStrategy({
                 email: profile.emails?.[0]?.value
             });
         }
-
         done(null, user);
     } catch (error) {
         done(error, null);

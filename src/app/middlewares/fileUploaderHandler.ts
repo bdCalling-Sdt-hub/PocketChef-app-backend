@@ -29,6 +29,9 @@ const fileUploadHandler = () => {
                 case "profile":
                     uploadDir = path.join(baseUploadDir, 'profiles');
                     break;
+                case "category":
+                    uploadDir = path.join(baseUploadDir, "category")
+                    break
                 default:
                     return cb(new Error('File type is not supported'), '');
             }
@@ -61,9 +64,12 @@ const fileUploadHandler = () => {
             cb(null, true);
         } else if (file.fieldname === 'profile' && allowedImageTypes.includes(file.mimetype)) {
             cb(null, true);
+        } else if (file.fieldname === 'category' && allowedImageTypes.includes(file.mimetype)) {
+            cb(null, true);
         } else {
             cb(null, false);
         }
+
     };
 
 
@@ -74,7 +80,8 @@ const fileUploadHandler = () => {
     }).fields([
         { name: 'image', maxCount: 3 },
         { name: 'video', maxCount: 2 },
-        { name: 'profile', maxCount: 1 }
+        { name: 'profile', maxCount: 1 },
+        { name: 'category', maxCount: 1 }
     ]);
 };
 

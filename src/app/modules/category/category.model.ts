@@ -8,7 +8,7 @@ const serviceSchema = new Schema<ICategory, CategoryModel>(
       required: true,
       unique: true,
     },
-    image: {
+    category: {
       type: String,
       required: true
     },

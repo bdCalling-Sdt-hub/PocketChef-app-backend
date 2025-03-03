@@ -7,13 +7,16 @@ import { CategoryService } from './category.service'
 const createCategory = catchAsync(async (req: Request, res: Response) => {
   const serviceData = req.body;
 
-  let image = "";
-  if (req.files && "image" in req.files && req.files.image[0]) {
-    image = `/images/${req.files.image[0].filename}`;
+  let category = "";
+  // if (req.files && "category" in req.files && req.files.category[0]) {
+  //   category = `/category/${req.files.image[0].filename}`;
+  // }
+  if (req.files && "category" in req.files && Array.isArray(req.files.category) && req.files.category.length > 0) {
+    category = `/category/${req.files.category[0].filename}`;
   }
   const data = {
     ...serviceData,
-    image,
+    category,
   };
 
   const result = await CategoryService.createCategoryToDB(data)

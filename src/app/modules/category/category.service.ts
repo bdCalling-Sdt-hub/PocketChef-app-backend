@@ -6,17 +6,17 @@ import unlinkFile from '../../../shared/unlinkFile'
 import { Bookmark } from '../bookmark/bookmark.model'
 
 const createCategoryToDB = async (payload: ICategory) => {
-  const {name, image} = payload;
-  const isExistName = await Category.findOne({name: name})
+  const { name, category } = payload;
+  const isExistName = await Category.findOne({ name: name })
 
-  if(isExistName){
-    unlinkFile(image);
+  if (isExistName) {
+    unlinkFile(category);
     throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "This Category Name Already Exist");
   }
 
-  const createCategory:any = await Category.create(payload)
+  const createCategory: any = await Category.create(payload)
   if (!createCategory) {
-    unlinkFile(image);
+    unlinkFile(category);
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Category')
   }
 
@@ -29,13 +29,13 @@ const getCategoriesFromDB = async (): Promise<ICategory[]> => {
 }
 
 const updateCategoryToDB = async (id: string, payload: ICategory) => {
-  const isExistCategory:any = await Category.findById(id);
+  const isExistCategory: any = await Category.findById(id);
 
-  if(!isExistCategory){
+  if (!isExistCategory) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Category doesn't exist");
   }
-  
-  if (payload.image) {
+
+  if (payload.category) {
     unlinkFile(isExistCategory?.image);
   }
 

@@ -9,7 +9,9 @@ const router = express.Router()
 
 router.post(
   '/create-service',
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), fileUploadHandler(),
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  // @ts-ignore
+  fileUploadHandler(),
   validateRequest(CategoryValidation.createCategoryZodSchema),
   CategoryController.createCategory,
 )
@@ -17,7 +19,9 @@ router.post(
 router
   .route('/:id')
   .patch(
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), fileUploadHandler(),
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    // @ts-ignore
+    fileUploadHandler(),
     CategoryController.updateCategory,
   )
   .delete(

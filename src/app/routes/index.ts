@@ -7,6 +7,7 @@ import { AdminRoutes } from '../modules/admin/admin.route';
 import { RequestRecipeRoutes } from '../modules/R.Recipes/R.Recipes.routes';
 import { CollectionRoutes } from '../modules/collection/collection.route';
 import { ratingRoutes } from '../modules/rating/rating.route';
+import { CategoryRoutes } from '../modules/category/category.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -17,7 +18,8 @@ const apiRoutes = [
     { path: "/terms-and-conditions", route: termsAndConditionRoutes },
     { path: "/recipes", route: RequestRecipeRoutes },
     { path: "/collection", route: CollectionRoutes },
-    { path: "/rating", route: ratingRoutes }
+    { path: "/rating", route: ratingRoutes },
+    { path: "/", route: CategoryRoutes }
 ]
 
 apiRoutes.forEach(route => router.use(route.path, route.route));
