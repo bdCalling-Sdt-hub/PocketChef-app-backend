@@ -63,6 +63,15 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
             }
         },
         {
+            // Lookup category for each recipe
+            $lookup: {
+                from: "categories", // Category collection name
+                localField: "category", // Field in Recipe schema
+                foreignField: "_id", // _id in Category schema
+                as: "category"
+            }
+        },
+        {
             $addFields: {
                 averageRating: {
                     $cond: {
@@ -88,7 +97,7 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
     ]);
 
 
-    const total = await Recipe.countDocuments();
+    const total = await Recipe.countDocuments().populate("category");
     if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
 
     return {
@@ -118,6 +127,8 @@ const deleteRecipeFromDB = async (id: string) => {
     if (!recipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
     return recipe;
 }
+
+
 
 
 

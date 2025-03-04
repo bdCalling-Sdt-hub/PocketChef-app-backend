@@ -32,6 +32,7 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
     recipeData.dietaryPreferences = parseArrayField(recipeData.dietaryPreferences, "dietaryPreferences");
     recipeData.tags = parseArrayField(recipeData.tags, "tags");
     recipeData.instructions = parseArrayField(recipeData.instructions, "instructions");
+    recipeData.NutritionalValue = parseArrayField(recipeData.NutritionalValue, "NutritionalValue")
 
     recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
 
@@ -46,10 +47,6 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-
-
-
-
 // update recipe for 
 const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;
@@ -57,7 +54,6 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     if (recipeData.prepTime || recipeData.cookTime) {
         recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
     }
-    // Pass the files directly from the request to the service
     const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as Express.Multer.File[]);
 
     // Send the response with the updated recipe

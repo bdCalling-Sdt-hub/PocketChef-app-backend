@@ -24,6 +24,20 @@ const reviewSchema = new Schema({
     replies: [{ type: Schema.Types.Mixed }]
 });
 
+
+// NutritionalValue
+
+
+// [
+//     { "name": "Energy", "Kcal": "680 g" },
+//     { "name": "Protein", "Kcal": "28.24g" }
+// ]
+const NutritionalValue = new Schema({
+    name: { type: String, require: true },
+    Kcal: { type: String, require: true }
+})
+
+
 // Define the main recipe schema
 const recipeSchema = new Schema<IRecipes>(
     {
@@ -33,7 +47,7 @@ const recipeSchema = new Schema<IRecipes>(
         description: { type: String, required: true },
         portionSize: { type: Number, required: true },
         selectLevel: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
-        mealType: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+        category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
         keyIngredients: [{ type: String, required: true }],
         dietaryPreferences: [{ type: String, required: false }],
         totalTime: { type: Number, required: false },
@@ -42,8 +56,10 @@ const recipeSchema = new Schema<IRecipes>(
         instructions: [{ type: String, required: true }],
         ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
-        // favorite: [favoriteSchema],
-        // review: [reviewSchema]
+        NutritionalValue: [{
+            type: [NutritionalValue],
+            require: true
+        }]
     },
     {
         timestamps: true

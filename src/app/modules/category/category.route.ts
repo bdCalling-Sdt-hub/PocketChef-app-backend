@@ -29,7 +29,7 @@ router
     CategoryController.deleteCategory,
   )
 
-router.get('/',
+router.get('/category',
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   CategoryController.getCategories,
 )

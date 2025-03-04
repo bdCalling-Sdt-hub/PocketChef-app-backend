@@ -54,9 +54,21 @@ const deleteCategoryToDB = async (id: string): Promise<ICategory | null> => {
   return deleteCategory
 }
 
+
+
+// get all category
+const getAllCategoryFromDB = async () => {
+  const result = await Category.find()
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Category Not Found")
+  }
+  return result
+}
+
 export const CategoryService = {
   createCategoryToDB,
   getCategoriesFromDB,
   updateCategoryToDB,
-  deleteCategoryToDB
+  deleteCategoryToDB,
+  getAllCategoryFromDB
 }

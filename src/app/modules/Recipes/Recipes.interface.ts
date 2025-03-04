@@ -24,7 +24,7 @@ export type IRecipes = {
     description: string;
     portionSize: number;
     selectLevel: "Easy" | "Medium" | "Hard";
-    mealType: Types.ObjectId;
+    category: Types.ObjectId;
     keyIngredients: string[];
     dietaryPreferences: string[];
     prepTime: number;
@@ -33,6 +33,7 @@ export type IRecipes = {
     instructions: string[];
     ingredientName: IIngredient[];
     tags: string[];
+    NutritionalValue: string[]
     // favorite?: IFavorite[]
     // review?: IReview[]
 }
