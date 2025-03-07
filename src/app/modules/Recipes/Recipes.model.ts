@@ -59,7 +59,12 @@ const recipeSchema = new Schema<IRecipes>(
         NutritionalValue: [{
             type: [NutritionalValue],
             require: true
-        }]
+        }],
+        subCategory: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: "Subcategory"
+        }
     },
     {
         timestamps: true

@@ -49,63 +49,140 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 
 // get all recipes
 
-const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
+// const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
+//     const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
+
+//     const recipes = await Recipe.aggregate([
+//         {
+//             // start matching with recipe collection
+//             $lookup: {
+//                 from: "ratings",
+//                 localField: "_id", // Recipe _id
+//                 foreignField: "recipeId", // Rating recipeId
+//                 as: "ratings"
+//             }
+//         },
+//         {
+//             // Lookup category for each recipe
+//             $lookup: {
+//                 from: "categories", // Category collection name
+//                 localField: "category", // Field in Recipe schema
+//                 foreignField: "_id", // _id in Category schema
+//                 as: "category"
+//             }
+//         },
+//         {
+//             $lookup: {
+//                 from: "subcategories",
+//                 localField: "subCategory",
+//                 foreignField: "_id",
+//                 as: "subcategory"
+//             }
+//         },
+//         {
+//             $addFields: {
+//                 averageRating: {
+//                     $cond: {
+//                         if: { $gt: [{ $size: "$ratings" }, 0] },
+//                         then: {
+//                             $avg: "$ratings.star" // Average of the 'star' field in ratings
+//                         },
+//                         else: 0
+//                     }
+//                 },
+//                 totalRatings: { $size: "$ratings" } // Count total ratings
+//             }
+//         },
+//         {
+//             $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 }
+//         },
+//         {
+//             $skip: skip
+//         },
+//         {
+//             $limit: limit
+//         }
+//     ]);
+
+
+//     const total = await Recipe.countDocuments().populate("category");
+//     if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
+
+//     return {
+//         meta: {
+//             page,
+//             limit,
+//             total
+//         },
+//         data: recipes
+//     };
+// };
+
+const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?: string) => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
 
+    // Define the match filter
+    const matchFilter: any = {};
+
+    if (searchTerm) {
+        matchFilter.$or = [
+            { recipeName: { $regex: searchTerm, $options: "i" } }, // Case-insensitive search for recipe name
+            { tags: { $regex: searchTerm, $options: "i" } }, // Search in tags
+            { keyIngredients: { $regex: searchTerm, $options: "i" } } // Search in key ingredients
+        ];
+    }
+
     const recipes = await Recipe.aggregate([
+        { $match: matchFilter }, // Apply search filter
         {
-            // start matching with recipe collection
             $lookup: {
-                from: "ratings",
-                localField: "_id", // Recipe _id
-                foreignField: "recipeId", // Rating recipeId
-                as: "ratings"
+                from: "subcategories",
+                localField: "subCategory",
+                foreignField: "_id",
+                as: "subcategory"
             }
         },
         {
-            // Lookup category for each recipe
             $lookup: {
-                from: "categories", // Category collection name
-                localField: "category", // Field in Recipe schema
-                foreignField: "_id", // _id in Category schema
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
                 as: "category"
+            }
+        },
+        {
+            $lookup: {
+                from: "ratings",
+                localField: "_id",
+                foreignField: "recipeId",
+                as: "ratings"
             }
         },
         {
             $addFields: {
                 averageRating: {
                     $cond: {
-                        if: { $gt: [{ $size: "$ratings" }, 0] }, // If there are ratings
-                        then: {
-                            $avg: "$ratings.star" // Average of the 'star' field in ratings
-                        },
+                        if: { $gt: [{ $size: "$ratings" }, 0] },
+                        then: { $avg: "$ratings.star" },
                         else: 0
                     }
                 },
-                totalRatings: { $size: "$ratings" } // Count total ratings
+                totalRatings: { $size: "$ratings" }
             }
         },
         {
             $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 }
         },
-        {
-            $skip: skip
-        },
-        {
-            $limit: limit
-        }
+        { $skip: skip },
+        { $limit: limit }
     ]);
 
+    const total = await Recipe.countDocuments(matchFilter); // Count based on the search filter
 
-    const total = await Recipe.countDocuments().populate("category");
     if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
 
     return {
-        meta: {
-            page,
-            limit,
-            total
-        },
+        meta: { page, limit, total },
         data: recipes
     };
 };

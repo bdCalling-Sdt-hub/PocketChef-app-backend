@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.post(
   '/create-service',
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  // auth(USER_ROLES.ADMIN),
   // @ts-ignore
   fileUploadHandler(),
   validateRequest(CategoryValidation.createCategoryZodSchema),

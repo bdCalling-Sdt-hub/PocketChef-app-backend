@@ -69,19 +69,23 @@ const updateRecipe = catchAsync(async (req: Request, res: Response) => {
 // all recipes
 const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
     const paginationOptions = {
-        page: Number(req.query.page),
-        limit: Number(req.query.limit),
+        page: Number(req.query.page) || 1,
+        limit: Number(req.query.limit) || 10,
         sortBy: req.query.sortBy as string,
         sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
-    }
-    const result = await RecipeService.getAllRecipes(paginationOptions);
+    };
+
+    const searchTerm = req.query.searchTerm as string; // Extract search query from request
+
+    const result = await RecipeService.getAllRecipes(paginationOptions, searchTerm);
+
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         Total: result.data.length,
         success: true,
         message: 'All Recipes retrieved successfully',
         data: result,
-    })
+    });
 })
 
 // single recipe

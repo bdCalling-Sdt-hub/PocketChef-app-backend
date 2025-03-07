@@ -34,6 +34,7 @@ export type IRecipes = {
     ingredientName: IIngredient[];
     tags: string[];
     NutritionalValue: string[]
+    subCategory: Types.ObjectId
     // favorite?: IFavorite[]
     // review?: IReview[]
 }
