@@ -46,7 +46,6 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 };
 
 
-
 // get all recipes
 
 const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?: string) => {
@@ -126,11 +125,6 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
 };
 
 
-
-
-
-
-
 const getSingleRecipe = async (id: string) => {
     const recipe = await Recipe.findById(id);
     if (!recipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
@@ -145,15 +139,10 @@ const deleteRecipeFromDB = async (id: string) => {
     return recipe;
 }
 
-
-
-
-
 export const RecipeService = {
     createRecipeIntoDB,
     updateRecipeIntoDB,
     getAllRecipes,
     getSingleRecipe,
     deleteRecipeFromDB,
-
 }
