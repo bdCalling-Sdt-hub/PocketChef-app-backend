@@ -49,75 +49,6 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 
 // get all recipes
 
-// const getAllRecipes = async (paginationOptions: IPaginationOptions) => {
-//     const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
-
-//     const recipes = await Recipe.aggregate([
-//         {
-//             // start matching with recipe collection
-//             $lookup: {
-//                 from: "ratings",
-//                 localField: "_id", // Recipe _id
-//                 foreignField: "recipeId", // Rating recipeId
-//                 as: "ratings"
-//             }
-//         },
-//         {
-//             // Lookup category for each recipe
-//             $lookup: {
-//                 from: "categories", // Category collection name
-//                 localField: "category", // Field in Recipe schema
-//                 foreignField: "_id", // _id in Category schema
-//                 as: "category"
-//             }
-//         },
-//         {
-//             $lookup: {
-//                 from: "subcategories",
-//                 localField: "subCategory",
-//                 foreignField: "_id",
-//                 as: "subcategory"
-//             }
-//         },
-//         {
-//             $addFields: {
-//                 averageRating: {
-//                     $cond: {
-//                         if: { $gt: [{ $size: "$ratings" }, 0] },
-//                         then: {
-//                             $avg: "$ratings.star" // Average of the 'star' field in ratings
-//                         },
-//                         else: 0
-//                     }
-//                 },
-//                 totalRatings: { $size: "$ratings" } // Count total ratings
-//             }
-//         },
-//         {
-//             $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 }
-//         },
-//         {
-//             $skip: skip
-//         },
-//         {
-//             $limit: limit
-//         }
-//     ]);
-
-
-//     const total = await Recipe.countDocuments().populate("category");
-//     if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
-
-//     return {
-//         meta: {
-//             page,
-//             limit,
-//             total
-//         },
-//         data: recipes
-//     };
-// };
-
 const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?: string) => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
 
@@ -131,7 +62,7 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
             { recipeName: { $regex: searchTerm, $options: "i" } },
             { tags: { $in: [searchTerm] } },
             { keyIngredients: { $in: [searchTerm] } },
-            { "subcategory.subCategory": { $regex: searchTerm, $options: "i" } } // 🔥 Ensure subcategory search
+            { "subcategory.subCategory": { $regex: searchTerm, $options: "i" } }
         ];
     }
 
@@ -147,7 +78,7 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
             }
         },
         {
-            $match: matchFilter // 🔥 Dynamic filtering
+            $match: matchFilter
         },
         {
             $lookup: {
@@ -185,7 +116,6 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
     console.log("🔍 Recipes Found:", recipes.length);
 
     if (!recipes.length) {
-        console.error("🚨 No Recipes Found for searchTerm:", searchTerm);
         throw new ApiError(StatusCodes.NOT_FOUND, "Recipes not found");
     }
 
