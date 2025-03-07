@@ -75,7 +75,7 @@ const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
         sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
     };
 
-    const searchTerm = req.query.searchTerm as string; // Extract search query from request
+    const searchTerm = req.query.searchTerm as string; // Accept search input
 
     const result = await RecipeService.getAllRecipes(paginationOptions, searchTerm);
 
@@ -86,7 +86,8 @@ const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
         message: 'All Recipes retrieved successfully',
         data: result,
     });
-})
+});
+
 
 // single recipe
 const getSingleRecipe = catchAsync(async (req: Request, res: Response) => {

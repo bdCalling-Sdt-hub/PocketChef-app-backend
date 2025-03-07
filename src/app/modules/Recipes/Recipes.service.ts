@@ -121,26 +121,33 @@ const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express
 const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?: string) => {
     const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(paginationOptions);
 
-    // Define the match filter
+    // Ensure searchTerm is always a string
+    searchTerm = searchTerm ? String(searchTerm).trim() : "";
+
     const matchFilter: any = {};
 
     if (searchTerm) {
         matchFilter.$or = [
-            { recipeName: { $regex: searchTerm, $options: "i" } }, // Case-insensitive search for recipe name
-            { tags: { $regex: searchTerm, $options: "i" } }, // Search in tags
-            { keyIngredients: { $regex: searchTerm, $options: "i" } } // Search in key ingredients
+            { recipeName: { $regex: searchTerm, $options: "i" } },
+            { tags: { $in: [searchTerm] } },
+            { keyIngredients: { $in: [searchTerm] } },
+            { "subcategory.subCategory": { $regex: searchTerm, $options: "i" } } // 🔥 Ensure subcategory search
         ];
     }
 
+    console.log("🔍 Search Query Before Aggregation:", JSON.stringify(matchFilter, null, 2));
+
     const recipes = await Recipe.aggregate([
-        { $match: matchFilter }, // Apply search filter
         {
             $lookup: {
-                from: "subcategories",
+                from: "subcategories", // Ensure correct collection name
                 localField: "subCategory",
                 foreignField: "_id",
                 as: "subcategory"
             }
+        },
+        {
+            $match: matchFilter // 🔥 Dynamic filtering
         },
         {
             $lookup: {
@@ -170,22 +177,25 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
                 totalRatings: { $size: "$ratings" }
             }
         },
-        {
-            $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 }
-        },
+        { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
         { $skip: skip },
         { $limit: limit }
     ]);
 
-    const total = await Recipe.countDocuments(matchFilter); // Count based on the search filter
+    console.log("🔍 Recipes Found:", recipes.length);
 
-    if (!recipes.length) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipes not found');
+    if (!recipes.length) {
+        console.error("🚨 No Recipes Found for searchTerm:", searchTerm);
+        throw new ApiError(StatusCodes.NOT_FOUND, "Recipes not found");
+    }
 
     return {
-        meta: { page, limit, total },
+        meta: { page, limit, total: recipes.length },
         data: recipes
     };
 };
+
+
 
 
 
