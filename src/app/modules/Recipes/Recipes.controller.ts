@@ -97,7 +97,6 @@ const getSingleRecipe = catchAsync(async (req: Request, res: Response) => {
     // Extract `userId` from JWT token (set by auth middleware)
     const userId = (req as any).user?.id;
 
-    console.log("Received Recipe ID:", id, "Received User ID:", userId);
 
     // Validate Recipe ID and User ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -142,8 +141,6 @@ const getRecentlyViewed = catchAsync(async (req: Request, res: Response) => {
     if (!userId) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'User ID is missing');
     }
-
-    console.log("User ID in Controller:", userId);
 
     // Fetch the recently viewed recipes for the user
     const recentlyViewed = await RecipeService.getRecentlyViewed(userId);

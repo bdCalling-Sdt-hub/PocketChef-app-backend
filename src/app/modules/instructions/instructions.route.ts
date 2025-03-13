@@ -12,11 +12,9 @@ router.post(
     fileUploadHandler() as any,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log("Uploaded files:", req.files);  // Log the files to debug
 
             if (req.files) {
                 const instructions = getSingleFilePath(req.files, "instructions" as any);
-                console.log("Instructions image path:", instructions);  // Log the image path
 
                 req.body = {
                     ...req.body,

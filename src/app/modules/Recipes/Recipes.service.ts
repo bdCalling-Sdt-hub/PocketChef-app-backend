@@ -132,7 +132,6 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
 };
 
 const getSingleRecipe = async (id: string, userId: string) => {
-    console.log("Received Recipe ID:", id, "User ID:", userId);
 
     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Recipe ID or User ID");
@@ -172,9 +171,8 @@ const getSingleRecipe = async (id: string, userId: string) => {
             { $set: { createdAt: new Date() } },
             { upsert: true, new: true }
         );
-        console.log("Successfully logged in Recently Viewed");
     } catch (error) {
-        console.error("Error logging Recently Viewed:", error);
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
     }
     return recipe[0];
 };
@@ -194,7 +192,6 @@ const deleteRecipeFromDB = async (id: string) => {
 
 // get recently viewed
 const getRecentlyViewed = async (userId: string) => {
-    console.log("Fetching Recently Viewed for User ID:", userId);
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
 

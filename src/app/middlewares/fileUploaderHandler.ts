@@ -18,7 +18,6 @@ const fileUploadHandler = () => {
 
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            console.log('File received:', file);
             let uploadDir;
             switch (file.fieldname) {
                 case 'image':

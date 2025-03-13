@@ -20,7 +20,6 @@ const auth = (...roles: string[]) => async (req: Request, res: Response, next: N
                 token,
                 config.jwt.jwt_secret as Secret
             );
-            console.log(verifyUser);
             //set user to header
             (req as any).user = verifyUser;
 
