@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import mongoose, { model, Schema } from 'mongoose';
 import { IRecipes } from './Recipes.interface';
 
 // Define the ingredient schema properly
@@ -72,4 +72,21 @@ const recipeSchema = new Schema<IRecipes>(
     }
 );
 
-export const Recipe = model<IRecipes>('recipe', recipeSchema);
+export const Recipe = model<IRecipes>('Recipe', recipeSchema);
+
+
+
+const RecentlyViewedSchema = new mongoose.Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    recipeId: {
+        type: Schema.Types.ObjectId,
+        ref: "Recipe",
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+export const RecentlyViewed = mongoose.model("RecentlyViewed", RecentlyViewedSchema);

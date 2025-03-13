@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes"
 import ApiError from "../../../errors/ApiErrors"
 import { IRecipes } from "./Recipes.interface"
-import { Recipe } from "./Recipes.model"
+import { RecentlyViewed, Recipe } from "./Recipes.model"
 import { paginationHelper } from "../../../helpers/paginationHelper"
 import mongoose from "mongoose"
 import { IPaginationOptions } from "../../../types/pagination"
@@ -131,8 +131,13 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
     };
 };
 
+const getSingleRecipe = async (id: string, userId: string) => {
+    console.log("Received Recipe ID:", id, "User ID:", userId);
 
-const getSingleRecipe = async (id: string) => {
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Recipe ID or User ID");
+    }
+
     const recipe = await Recipe.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
         {
@@ -157,10 +162,25 @@ const getSingleRecipe = async (id: string) => {
         }
     ]);
 
-    if (!recipe.length) throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
+    if (!recipe.length) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
+    }
 
+    try {
+        await RecentlyViewed.findOneAndUpdate(
+            { userId: new mongoose.Types.ObjectId(userId), recipeId: new mongoose.Types.ObjectId(id) },
+            { $set: { createdAt: new Date() } },
+            { upsert: true, new: true }
+        );
+        console.log("Successfully logged in Recently Viewed");
+    } catch (error) {
+        console.error("Error logging Recently Viewed:", error);
+    }
     return recipe[0];
-}
+};
+
+
+
 
 // delete recipe
 
@@ -170,10 +190,36 @@ const deleteRecipeFromDB = async (id: string) => {
     return recipe;
 }
 
+
+
+// get recently viewed
+const getRecentlyViewed = async (userId: string) => {
+    console.log("Fetching Recently Viewed for User ID:", userId);
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Fetch RecentlyViewed records with populated recipeId
+    const recentlyViewed = await RecentlyViewed?.find({
+        userId: userObjectId
+    })
+        .populate('recipeId')
+        .sort({ createdAt: -1 })
+        .limit(6);
+
+    if (!recentlyViewed || !recentlyViewed.length) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No recently viewed recipes found');
+    }
+
+    return recentlyViewed;
+};
+
+
+
 export const RecipeService = {
     createRecipeIntoDB,
     updateRecipeIntoDB,
     getAllRecipes,
     getSingleRecipe,
     deleteRecipeFromDB,
+    getRecentlyViewed
 }

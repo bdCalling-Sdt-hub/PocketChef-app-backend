@@ -31,10 +31,13 @@ const fileUploadHandler = () => {
                     uploadDir = path.join(baseUploadDir, 'profiles');
                     break;
                 case "category":
-                    uploadDir = path.join(baseUploadDir, "category")
+                    uploadDir = path.join(baseUploadDir, "categorys")
                     break
                 case "instructions":
                     uploadDir = path.join(baseUploadDir, "instructions")
+                    break
+                case "bannerImage":
+                    uploadDir = path.join(baseUploadDir, "bannerImages")
                     break
                 default:
                     return cb(new Error('File type is not supported'), '');
@@ -72,6 +75,8 @@ const fileUploadHandler = () => {
             cb(null, true);
         } else if (file.fieldname === 'instructions' && allowedImageTypes.includes(file.mimetype)) {
             cb(null, true);
+        } else if (file.fieldname === 'bannerImage' && allowedImageTypes.includes(file.mimetype)) {
+            cb(null, true);
         } else {
             cb(null, false);
         }
@@ -88,7 +93,8 @@ const fileUploadHandler = () => {
         { name: 'video', maxCount: 2 },
         { name: 'profile', maxCount: 1 },
         { name: 'category', maxCount: 1 },
-        { name: 'instructions', maxCount: 1 }
+        { name: 'instructions', maxCount: 1 },
+        { name: 'bannerImage', maxCount: 1 }
     ]);
 };
 

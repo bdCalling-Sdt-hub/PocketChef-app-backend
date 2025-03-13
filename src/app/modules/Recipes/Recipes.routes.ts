@@ -5,6 +5,8 @@ import fileUploadHandler from "../../middlewares/fileUploaderHandler";
 import { RecipeValidation } from "./Recipes.validation";
 import validateRequest from "../../middlewares/validateRequest";
 import { getMultipleFilesPath, getSingleFilePath } from "../../../shared/getFilePath";
+import auth from "../../middlewares/auth";
+import { USER_ROLES } from "../../../enums/user";
 
 const router = Router();
 
@@ -38,6 +40,11 @@ router.post(
     RecipeController.createRecipe
 );
 
+// all recipes route
+router.get("/", RecipeController.getAllRecipe);
+
+router.get('/recently-viewed', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.USER), RecipeController.getRecentlyViewed);
+
 
 // update recipe route
 router.patch(
@@ -46,16 +53,18 @@ router.patch(
     RecipeController.updateRecipe
 );
 
-// all recipes route
-router.get("/", RecipeController.getAllRecipe);
+
 
 // single recipe route
 
-router.get("/:id", RecipeController.getSingleRecipe);
+router.get("/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RecipeController.getSingleRecipe);
 
 // delete recipe route
 
 router.delete("/:id", RecipeController.deleteRecipe);
+
+
+
 
 
 export const RecipeRoutes = router;

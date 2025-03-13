@@ -4,6 +4,8 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { RecipeService } from "./Recipes.service";
 import ApiError from "../../../errors/ApiErrors";
+import { RecentlyViewed, Recipe } from "./Recipes.model";
+import mongoose, { isValidObjectId } from "mongoose";
 
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
@@ -92,14 +94,30 @@ const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
 // single recipe
 const getSingleRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;
-    const result = await RecipeService.getSingleRecipe(id);
+    // Extract `userId` from JWT token (set by auth middleware)
+    const userId = (req as any).user?.id;
+
+    console.log("Received Recipe ID:", id, "Received User ID:", userId);
+
+    // Validate Recipe ID and User ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid Recipe ID: ${id}`);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid User ID: ${userId}`);
+    }
+
+    // Fetch the single recipe using the service
+    const result = await RecipeService.getSingleRecipe(id, userId);
+
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: 'Single Recipe retrieved successfully',
+        message: "Single Recipe retrieved successfully",
         data: result,
-    })
-})
+    });
+});
 
 
 // delete recipe
@@ -117,11 +135,45 @@ const deleteRecipe = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const getRecentlyViewed = catchAsync(async (req: Request, res: Response) => {
+    const userId: any = req.user?.id;
+
+    // Check if userId exists
+    if (!userId) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'User ID is missing');
+    }
+
+    console.log("User ID in Controller:", userId);
+
+    // Fetch the recently viewed recipes for the user
+    const recentlyViewed = await RecipeService.getRecentlyViewed(userId);
+
+    if (!recentlyViewed || !recentlyViewed.length) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No recently viewed recipes found');
+    }
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Recently viewed recipes fetched successfully',
+        data: recentlyViewed,
+    });
+});
+
+
+
+
+
+
+
+
+
+
 export const RecipeController = {
     createRecipe,
     updateRecipe,
     getAllRecipe,
     getSingleRecipe,
     deleteRecipe,
-
+    getRecentlyViewed
 }
