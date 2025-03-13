@@ -84,7 +84,7 @@ const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
         Total: result.data.length,
         success: true,
         message: 'All Recipes retrieved successfully',
-        data: result,
+        data: result.data,
     });
 });
 

@@ -3,6 +3,7 @@ import ApiError from "../../../errors/ApiErrors"
 import { IRecipes } from "./Recipes.interface"
 import { Recipe } from "./Recipes.model"
 import { IPaginationOptions, paginationHelper } from "../../../helpers/paginationHelper"
+import mongoose from "mongoose"
 
 const createRecipeIntoDB = async (payload: IRecipes) => {
 
@@ -65,12 +66,10 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
         ];
     }
 
-    console.log("🔍 Search Query Before Aggregation:", JSON.stringify(matchFilter, null, 2));
-
     const recipes = await Recipe.aggregate([
         {
             $lookup: {
-                from: "subcategories", // Ensure correct collection name
+                from: "subcategories",
                 localField: "subCategory",
                 foreignField: "_id",
                 as: "subcategory"
@@ -112,7 +111,6 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
         { $limit: limit }
     ]);
 
-    console.log("🔍 Recipes Found:", recipes.length);
 
     if (!recipes.length) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Recipes not found");
@@ -126,9 +124,33 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
 
 
 const getSingleRecipe = async (id: string) => {
-    const recipe = await Recipe.findById(id);
-    if (!recipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
-    return recipe;
+    const recipe = await Recipe.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        {
+            $lookup: {
+                from: "ratings",
+                localField: "ratings",
+                foreignField: "_id",
+                as: "ratingsData"
+            }
+        },
+        {
+            $addFields: {
+                averageRating: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$ratingsData" }, 0] },
+                        then: { $avg: "$ratingsData.star" },
+                        else: 0
+                    }
+                },
+                totalRatings: { $size: "$ratingsData" }
+            }
+        }
+    ]);
+
+    if (!recipe.length) throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
+
+    return recipe[0];
 }
 
 // delete recipe
