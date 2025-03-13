@@ -1,12 +1,6 @@
-export interface IPaginationOptions {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-}
+import { IPaginationOptions } from "../types/pagination";
 
-
-const calculatePagination = (options: IPaginationOptions) => {
+export const calculatePagination = (options: IPaginationOptions) => {
     const page = Number(options.page || 1);
     const limit = Number(options.limit || 10);
 

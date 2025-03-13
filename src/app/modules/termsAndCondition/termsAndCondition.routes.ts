@@ -16,4 +16,7 @@ router.put("/update/:id", termsAndConditionController.updateTermsAndCondition)
 router.delete("/delete/:id", termsAndConditionController.deleteTermsAndCondition)
 
 
+// get all terms and conditions
+router.get("/", termsAndConditionController.getTermsAndCondition)
+
 export const termsAndConditionRoutes = router;

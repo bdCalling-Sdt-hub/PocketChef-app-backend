@@ -18,6 +18,7 @@ const fileUploadHandler = () => {
 
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
+            console.log('File received:', file);
             let uploadDir;
             switch (file.fieldname) {
                 case 'image':
@@ -31,6 +32,9 @@ const fileUploadHandler = () => {
                     break;
                 case "category":
                     uploadDir = path.join(baseUploadDir, "category")
+                    break
+                case "instructions":
+                    uploadDir = path.join(baseUploadDir, "instructions")
                     break
                 default:
                     return cb(new Error('File type is not supported'), '');
@@ -66,6 +70,8 @@ const fileUploadHandler = () => {
             cb(null, true);
         } else if (file.fieldname === 'category' && allowedImageTypes.includes(file.mimetype)) {
             cb(null, true);
+        } else if (file.fieldname === 'instructions' && allowedImageTypes.includes(file.mimetype)) {
+            cb(null, true);
         } else {
             cb(null, false);
         }
@@ -81,7 +87,8 @@ const fileUploadHandler = () => {
         { name: 'image', maxCount: 3 },
         { name: 'video', maxCount: 2 },
         { name: 'profile', maxCount: 1 },
-        { name: 'category', maxCount: 1 }
+        { name: 'category', maxCount: 1 },
+        { name: 'instructions', maxCount: 1 }
     ]);
 };
 

@@ -53,13 +53,14 @@ const recipeSchema = new Schema<IRecipes>(
         totalTime: { type: Number, required: false },
         prepTime: { type: Number, required: true },
         cookTime: { type: Number, required: true },
-        instructions: [{ type: String, required: true }],
+        instructions: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Instructions',
+            required: true
+        }],
         ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
-        NutritionalValue: [{
-            type: [NutritionalValue],
-            require: true
-        }],
+        NutritionalValue: [NutritionalValue],
         subCategory: {
             type: Schema.Types.ObjectId,
             required: true,

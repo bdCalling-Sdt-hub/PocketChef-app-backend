@@ -30,7 +30,7 @@ export type IRecipes = {
     prepTime: number;
     cookTime: number;
     totalTime?: number;
-    instructions: string[];
+    instructions: Types.ObjectId[];
     ingredientName: IIngredient[];
     tags: string[];
     NutritionalValue: string[]

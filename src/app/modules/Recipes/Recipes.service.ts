@@ -2,8 +2,9 @@ import { StatusCodes } from "http-status-codes"
 import ApiError from "../../../errors/ApiErrors"
 import { IRecipes } from "./Recipes.interface"
 import { Recipe } from "./Recipes.model"
-import { IPaginationOptions, paginationHelper } from "../../../helpers/paginationHelper"
+import { paginationHelper } from "../../../helpers/paginationHelper"
 import mongoose from "mongoose"
+import { IPaginationOptions } from "../../../types/pagination"
 
 const createRecipeIntoDB = async (payload: IRecipes) => {
 
@@ -92,6 +93,14 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
                 localField: "_id",
                 foreignField: "recipeId",
                 as: "ratings"
+            }
+        },
+        {
+            $lookup: {
+                from: "instructions",
+                localField: "instructions",
+                foreignField: "_id",
+                as: "instructions"
             }
         },
         {

@@ -55,9 +55,19 @@ const deleteTermsAndCondition = catchAsync(async (req: Request, res: Response) =
 })
 
 
+const getTermsAndCondition = catchAsync(async (req: Request, res: Response) => {
+    const result = await termsAndConditionService.getTermsAndCondition();
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Terms and Condition fetched successfully',
+        data: result
+    })
+})
 // export function to get all terms and conditions
 export const termsAndConditionController = {
     createTermsAndCondition,
     updateTermsAndCondition,
-    deleteTermsAndCondition
+    deleteTermsAndCondition,
+    getTermsAndCondition
 }

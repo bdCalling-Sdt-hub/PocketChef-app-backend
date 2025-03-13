@@ -9,6 +9,7 @@ import { CollectionRoutes } from '../modules/collection/collection.route';
 import { ratingRoutes } from '../modules/rating/rating.route';
 import { CategoryRoutes } from '../modules/category/category.route';
 import { SubcategoryRoutes } from '../modules/subcategory/subcategory.route';
+import { InstructionsRoutes } from '../modules/instructions/instructions.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -21,7 +22,8 @@ const apiRoutes = [
     { path: "/collection", route: CollectionRoutes },
     { path: "/rating", route: ratingRoutes },
     { path: "/", route: CategoryRoutes },
-    { path: "/subcategory", route: SubcategoryRoutes }
+    { path: "/subcategory", route: SubcategoryRoutes },
+    { path: "/", route: InstructionsRoutes }
 ]
 
 apiRoutes.forEach(route => router.use(route.path, route.route));

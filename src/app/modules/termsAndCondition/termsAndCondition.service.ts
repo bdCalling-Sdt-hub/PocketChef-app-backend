@@ -37,9 +37,14 @@ const deleteTermsAndCondition = async (id: string): Promise<void> => {
 };
 
 // get terms and condition
+const getTermsAndCondition = async (): Promise<ITermsAndCondition[]> => {
+    const termsAndCondition = await termsAndConditionModel.find();
+    return termsAndCondition;
+}
 
 export const termsAndConditionService = {
     createTermsAndCondition,
     updateTermsAndCondition,
-    deleteTermsAndCondition
+    deleteTermsAndCondition,
+    getTermsAndCondition
 }
