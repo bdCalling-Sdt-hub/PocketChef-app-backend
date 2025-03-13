@@ -4,7 +4,7 @@ export type ICarusel = {
   category: string
   name: string
   description: string
-  bannerImage: string
+  bannerImages: string
 };
 
 export type CaruselModel = Model<ICarusel>;

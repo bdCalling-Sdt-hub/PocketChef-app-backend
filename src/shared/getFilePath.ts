@@ -4,7 +4,7 @@ type IFolderName = 'image' | 'media' | 'doc';
 export const getSingleFilePath = (files: any, folderName: IFolderName) => {
     const fileField = files && files[folderName];
     if (fileField && Array.isArray(fileField) && fileField.length > 0) {
-        return `/${folderName}s/${fileField[0].filename}`;
+        return `/${folderName}/${fileField[0].filename}`;
     }
 
     return undefined;

@@ -33,7 +33,7 @@ router.post('/',
                 preparation: payload.preparation,
             };
 
-            next(); // Pass to Zod validation
+            next();
         } catch (error) {
             sendResponse(res, {
                 statusCode: 400,
@@ -50,5 +50,47 @@ router.post('/',
 
 
 router.get('/', IngredientsController.getAllIngredients);
+
+router.get('/:id', IngredientsController.getSingleIngredients);
+
+router.put('/:id',
+    fileUploadHandler() as any,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            if (!req.files) {
+                throw new Error('No files uploaded');
+            }
+
+            // Extract payload from FormData
+            const payload = req.body;
+
+            // Get the image path
+            // @ts-ignore
+            const ingredientImages = getSingleFilePath(req.files, 'ingredientImages' as any);
+
+            // Convert FormData to JSON manually
+            req.body = {
+                ingredientImages,
+                name: payload.name,
+                subName: payload.subName,
+                description: payload.description,
+                preparation: payload.preparation,
+            };
+
+            next();
+        } catch (error) {
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Failed to update ingredients",
+                data: null
+            });
+        }
+    },
+    validateRequest(IngredientsValidations.updateIngredientsZodSchema),
+    IngredientsController.updateIngredients
+);
+
+router.delete('/:id', IngredientsController.deleteIngredients);
 
 export const IngredientsRoutes = router;

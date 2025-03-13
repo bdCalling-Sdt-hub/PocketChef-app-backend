@@ -5,7 +5,7 @@ const caruselSchema = new Schema<ICarusel, CaruselModel>({
   category: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
-  bannerImage: { type: String, required: true },
+  bannerImages: { type: String, required: true },
 
 }, {
   timestamps: true,

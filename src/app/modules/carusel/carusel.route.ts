@@ -15,9 +15,11 @@ router.post("/",
                 throw new Error('No files uploaded');
             }
             const payload = req.body;
-            const bannerImage = getSingleFilePath(req.files, 'bannerImage' as any);
+            const bannerImages = getSingleFilePath(req.files, 'bannerImages' as any);
+            console.log(payload);
+            console.log(bannerImages);
             req.body = {
-                bannerImage,
+                bannerImages,
                 ...payload
             };
             next();
