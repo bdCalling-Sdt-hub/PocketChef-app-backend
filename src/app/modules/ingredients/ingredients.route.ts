@@ -31,6 +31,8 @@ router.post('/',
                 subName: payload.subName,
                 description: payload.description,
                 preparation: payload.preparation,
+                amount: payload.amount,
+                unit: payload.unit,
             };
 
             next();
@@ -75,6 +77,8 @@ router.put('/:id',
                 subName: payload.subName,
                 description: payload.description,
                 preparation: payload.preparation,
+                amount: payload.amount,
+                unit: payload.unit,
             };
 
             next();

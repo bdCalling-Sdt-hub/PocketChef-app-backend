@@ -7,34 +7,49 @@ import ApiError from "../../../errors/ApiErrors";
 import { RecentlyViewed, Recipe } from "./Recipes.model";
 import mongoose, { isValidObjectId } from "mongoose";
 
+
+
+
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
 
-    const parseArrayField = (field: any, fieldName: string) => {
+    const parseArrayField = (field: any, fieldName: string, isObjectIdArray = false) => {
+        if (Array.isArray(field)) {
+            return isObjectIdArray
+                ? field.map((id) => new mongoose.Types.ObjectId(id))
+                : field;
+        }
+
         if (typeof field === "string") {
             const trimmedField = field.trim();
 
             if (trimmedField.startsWith("[") && trimmedField.endsWith("]")) {
                 try {
-                    return JSON.parse(trimmedField);
-                } catch (error) {
-                    console.warn(`Invalid JSON format for ${fieldName}:`, trimmedField);
+                    const parsed = JSON.parse(trimmedField);
+                    if (Array.isArray(parsed)) {
+                        return isObjectIdArray
+                            ? parsed.map((id) => new mongoose.Types.ObjectId(id))
+                            : parsed;
+                    }
+                    throw new Error();
+                } catch {
                     throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid JSON format for ${fieldName}`);
                 }
             }
-            return trimmedField.split(",").map((item) => item.trim().replace(/^"(.*)"$/, "$1"));
         }
 
-        return Array.isArray(field) ? field : [];
+        return [];
     };
 
+    // Handling ObjectId[]
+    recipeData.ingredientName = parseArrayField(recipeData.ingredientName, "ingredientName", true);
+    recipeData.instructions = parseArrayField(recipeData.instructions, "instructions", true);
 
-    recipeData.ingredientName = parseArrayField(recipeData.ingredientName, "ingredientName");
+    // Handling String[]
     recipeData.keyIngredients = parseArrayField(recipeData.keyIngredients, "keyIngredients");
     recipeData.dietaryPreferences = parseArrayField(recipeData.dietaryPreferences, "dietaryPreferences");
     recipeData.tags = parseArrayField(recipeData.tags, "tags");
-    recipeData.instructions = parseArrayField(recipeData.instructions, "instructions");
-    recipeData.NutritionalValue = parseArrayField(recipeData.NutritionalValue, "NutritionalValue")
+    recipeData.NutritionalValue = parseArrayField(recipeData.NutritionalValue, "NutritionalValue");
 
     recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
 
@@ -53,16 +68,11 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
 const updateRecipe = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id;
     const recipeData = req.body;
-    if (recipeData.prepTime || recipeData.cookTime) {
-        recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
-    }
-    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req?.files as Express.Multer.File[]);
+    const updatedRecipe = await RecipeService.updateRecipeIntoDB(id, recipeData, req.files);
 
-    // Send the response with the updated recipe
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
+    res.status(200).json({
         success: true,
-        message: 'Recipe updated successfully',
+        message: "Recipe updated successfully",
         data: updatedRecipe,
     });
 });
@@ -77,7 +87,7 @@ const getAllRecipe = catchAsync(async (req: Request, res: Response) => {
         sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
     };
 
-    const searchTerm = req.query.searchTerm as string; // Accept search input
+    const searchTerm = req.query.searchTerm as string;
 
     const result = await RecipeService.getAllRecipes(paginationOptions, searchTerm);
 

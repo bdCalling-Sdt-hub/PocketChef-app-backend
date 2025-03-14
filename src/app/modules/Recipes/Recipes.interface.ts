@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
 
-export type IIngredient = {
-    name: string;
-    amount: number;
-    unit: string;
-};
+// export type IIngredient = {
+//     name: string;
+//     amount: number;
+//     unit: string;
+// };
 export type IFavorite = {
     userId: string;
     timestamp: Date;
@@ -31,7 +31,7 @@ export type IRecipes = {
     cookTime: number;
     totalTime?: number;
     instructions: Types.ObjectId[];
-    ingredientName: IIngredient[];
+    ingredientName: Types.ObjectId[];
     tags: string[];
     NutritionalValue: string[]
     subCategory: Types.ObjectId

@@ -49,6 +49,7 @@ router.get('/recently-viewed', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, US
 // update recipe route
 router.patch(
     "/update/:id",
+    fileUploadHandler() as any,
     // validateRequest(RecipeValidation.updateRecipeZodSchema),
     RecipeController.updateRecipe
 );

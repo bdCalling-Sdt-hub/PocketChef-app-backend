@@ -39,6 +39,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
     }
 
     // Check user status (if user is deactivated)
+    // @ts-ignore
     if (isExistUser.status === 'delete') {
         throw new ApiError(
             StatusCodes.BAD_REQUEST,
@@ -417,6 +418,9 @@ const banUserIntoDB = async (user: string) => {
     const result = await User.findByIdAndUpdate(user, { userBan: true });
     return result
 }
+
+
+
 
 
 export const AuthService = {

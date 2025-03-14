@@ -2,11 +2,7 @@ import mongoose, { model, Schema } from 'mongoose';
 import { IRecipes } from './Recipes.interface';
 
 // Define the ingredient schema properly
-const ingredientSchema = new Schema({
-    name: { type: String, required: true },
-    amount: { type: Number, required: true },
-    unit: { type: String, required: true }
-});
+
 
 // like schema
 const favoriteSchema = new Schema({
@@ -58,7 +54,7 @@ const recipeSchema = new Schema<IRecipes>(
             ref: 'Instructions',
             required: true
         }],
-        ingredientName: [ingredientSchema],
+        ingredientName: [{ type: Schema.Types.ObjectId, ref: "Ingredients", required: true }],
         tags: [{ type: String, required: false }],
         NutritionalValue: [NutritionalValue],
         subCategory: {

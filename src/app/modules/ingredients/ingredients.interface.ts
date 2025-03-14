@@ -6,6 +6,8 @@ export type IIngredients = {
   subName: string
   description: string
   preparation: string
+  amount: number
+  unit: string
 };
 
 export type IngredientsModel = Model<IIngredients>;

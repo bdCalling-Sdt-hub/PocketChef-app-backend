@@ -14,36 +14,21 @@ const createRecipeIntoDB = async (payload: IRecipes) => {
     return recipes
 }
 
-const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: Express.Multer.File[]) => {
-    // Fetch the existing recipe from the database to preserve missing fields (e.g., images or video)
+const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: any) => {
     const existingRecipe = await Recipe.findById(id);
-    if (!existingRecipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
+    if (!existingRecipe) throw new Error("Recipe not found");
 
-    // Handle image files (if any)
-    const getFilePaths = (files: Express.Multer.File[] | undefined): string[] => {
-        return files ? files.map((file) => file.path) : [];
-    };
+    const images = files?.image ? files.image.map((file: any) => file.path) : existingRecipe.image;
+    const video = files?.video ? files.video[0].path : existingRecipe.video;
 
-    // If no new images are uploaded, retain the old images
-    const images = files && 'image' in files ? getFilePaths(files['image'] as Express.Multer.File[]) : existingRecipe.image;
-
-    // Handle video (if present), retain the old video if no new one is uploaded
-    const video = files && 'video' in files ? (files['video'] as Express.Multer.File[])[0].path : payload.video || existingRecipe.video;
-
-    // Calculate total time
-    const prepTime = payload.prepTime ? Number(payload.prepTime) : existingRecipe.prepTime;
-    const cookTime = payload.cookTime ? Number(payload.cookTime) : existingRecipe.cookTime;
-    // Prepare the updated payload
     const updatedPayload = {
         ...payload,
-        prepTime,
-        cookTime,
         image: images,
-        video,
+        video: video,
+        totalTime: Number(payload.prepTime) + Number(payload.cookTime),
     };
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(id, updatedPayload, { new: true });
-    if (!updatedRecipe) throw new ApiError(StatusCodes.NOT_FOUND, 'Recipe not found');
     return updatedRecipe;
 };
 
@@ -131,14 +116,87 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
     };
 };
 
-const getSingleRecipe = async (id: string, userId: string) => {
+// const getSingleRecipe = async (id: string, userId: string) => {
 
+//     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
+//         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Recipe ID or User ID");
+//     }
+
+//     const recipe = await Recipe.aggregate([
+//         { $match: { _id: new mongoose.Types.ObjectId(id) } },
+//         {
+//             $lookup: {
+//                 from: "ratings",
+//                 localField: "ratings",
+//                 foreignField: "_id",
+//                 as: "ratingsData"
+//             }
+//         },
+//         {
+//             $addFields: {
+//                 averageRating: {
+//                     $cond: {
+//                         if: { $gt: [{ $size: "$ratingsData" }, 0] },
+//                         then: { $avg: "$ratingsData.star" },
+//                         else: 0
+//                     }
+//                 },
+//                 totalRatings: { $size: "$ratingsData" }
+//             }
+//         }
+//     ]);
+
+//     if (!recipe.length) {
+//         throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
+//     }
+
+//     try {
+//         await RecentlyViewed.findOneAndUpdate(
+//             { userId: new mongoose.Types.ObjectId(userId), recipeId: new mongoose.Types.ObjectId(id) },
+//             { $set: { createdAt: new Date() } },
+//             { upsert: true, new: true }
+//         );
+//     } catch (error) {
+//         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
+//     }
+//     return recipe[0];
+// };
+
+
+
+
+// delete recipe
+
+
+const getSingleRecipe = async (id: string, userId: string) => {
     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Recipe ID or User ID");
     }
 
     const recipe = await Recipe.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
+
+        // Lookup for ingredientName
+        {
+            $lookup: {
+                from: "ingredients",
+                localField: "ingredientName",
+                foreignField: "_id",
+                as: "ingredientData"
+            }
+        },
+
+        // Lookup for instructions
+        {
+            $lookup: {
+                from: "instructions",
+                localField: "instructions",
+                foreignField: "_id",
+                as: "instructionsData"
+            }
+        },
+
+        // Lookup for ratings
         {
             $lookup: {
                 from: "ratings",
@@ -147,6 +205,8 @@ const getSingleRecipe = async (id: string, userId: string) => {
                 as: "ratingsData"
             }
         },
+
+        // Add fields for ratings (average, total)
         {
             $addFields: {
                 averageRating: {
@@ -157,6 +217,13 @@ const getSingleRecipe = async (id: string, userId: string) => {
                     }
                 },
                 totalRatings: { $size: "$ratingsData" }
+            }
+        },
+
+        // Optionally remove raw ratings data if it's not needed in the response
+        {
+            $project: {
+                ratingsData: 0
             }
         }
     ]);
@@ -174,13 +241,14 @@ const getSingleRecipe = async (id: string, userId: string) => {
     } catch (error) {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
     }
+
     return recipe[0];
 };
 
 
 
 
-// delete recipe
+
 
 const deleteRecipeFromDB = async (id: string) => {
     const recipe = await Recipe.findByIdAndDelete(id);
