@@ -135,6 +135,7 @@ const deleteRecipe = catchAsync(async (req: Request, res: Response) => {
 
 
 const getRecentlyViewed = catchAsync(async (req: Request, res: Response) => {
+    // @ts-ignore
     const userId: any = req.user?.id;
 
     // Check if userId exists

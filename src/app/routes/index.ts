@@ -14,6 +14,7 @@ import { FaqRoutes } from '../modules/faq/faq.route';
 import { AboutRoutes } from '../modules/about/about.route';
 import { PrivacyandpolicyRoutes } from '../modules/privacyandpolicy/privacyandpolicy.route';
 import { CaruselRoutes } from '../modules/carusel/carusel.route';
+import { IngredientsRoutes } from '../modules/ingredients/ingredients.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -43,6 +44,10 @@ const apiRoutes = [
     {
         path: "/carusel",
         route: CaruselRoutes
+    },
+    {
+        path: "/ingredients",
+        route: IngredientsRoutes
     }
 ]
 

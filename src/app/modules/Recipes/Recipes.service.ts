@@ -193,22 +193,67 @@ const deleteRecipeFromDB = async (id: string) => {
 // get recently viewed
 const getRecentlyViewed = async (userId: string) => {
 
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-
-    // Fetch RecentlyViewed records with populated recipeId
-    const recentlyViewed = await RecentlyViewed?.find({
-        userId: userObjectId
-    })
-        .populate('recipeId')
-        .sort({ createdAt: -1 })
-        .limit(6);
-
-    if (!recentlyViewed || !recentlyViewed.length) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No recently viewed recipes found');
+    // Validate the userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid User ID");
     }
 
+    const recentlyViewed = await RecentlyViewed.aggregate([
+        {
+            $match: { userId: new mongoose.Types.ObjectId(userId) }  // Match by userId
+        },
+        {
+            $lookup: {
+                from: 'recipes',  // Join with recipes collection
+                localField: 'recipeId',  // Match 'recipeId' in RecentlyViewed
+                foreignField: '_id',  // Match with '_id' in recipes collection
+                as: 'recipeData'  // Alias for recipe data
+            }
+        },
+        {
+            $unwind: '$recipeData'  // Unwind the 'recipeData' array to flatten the structure
+        },
+        {
+            $lookup: {
+                from: 'ratings',  // Join with ratings collection
+                localField: 'recipeId',  // Match 'recipeId' in RecentlyViewed
+                foreignField: 'recipeId',  // Match with 'recipeId' in ratings collection
+                as: 'ratingsData'  // Alias for ratings data
+            }
+        },
+        {
+            $addFields: {
+                // Calculate the average rating if there are ratings
+                averageRating: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$ratingsData" }, 0] }, // Check if ratings exist
+                        then: { $avg: "$ratingsData.rating" },  // If there are ratings, calculate average
+                        else: null  // If no ratings, set it to null
+                    }
+                },
+                // Count the total number of ratings
+                totalRatings: { $size: "$ratingsData" }
+            }
+        },
+        {
+            $project: {
+                recipeData: 1,  // Include all fields from 'recipeData'
+                createdAt: 1,  // Include 'createdAt' field from RecentlyViewed
+                ratingsData: 1,  // Include all fields from 'ratingsData'
+                averageRating: 1,  // Include the calculated 'averageRating'
+                totalRatings: 1  // Include the total number of ratings
+            }
+        },
+        {
+            $sort: { createdAt: -1 }  // Sort by the most recently viewed first
+        }
+    ]);
+
+    // Return the aggregated recently viewed data
     return recentlyViewed;
 };
+
+
 
 
 
