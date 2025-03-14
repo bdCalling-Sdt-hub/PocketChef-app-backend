@@ -16,6 +16,7 @@ import { PrivacyandpolicyRoutes } from '../modules/privacyandpolicy/privacyandpo
 import { CaruselRoutes } from '../modules/carusel/carusel.route';
 import { IngredientsRoutes } from '../modules/ingredients/ingredients.route';
 import { RecommendedRoutes } from '../modules/recommended/recommended.route';
+import { AddtogroceryRoutes } from '../modules/addtogrocery/addtogrocery.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -53,6 +54,10 @@ const apiRoutes = [
     {
         path: "/recommended",
         route: RecommendedRoutes
+    },
+    {
+        path: "/addtogrocery",
+        route: AddtogroceryRoutes
     }
 ]
 
