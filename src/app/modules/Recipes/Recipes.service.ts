@@ -116,53 +116,6 @@ const getAllRecipes = async (paginationOptions: IPaginationOptions, searchTerm?:
     };
 };
 
-// const getSingleRecipe = async (id: string, userId: string) => {
-
-//     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
-//         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Recipe ID or User ID");
-//     }
-
-//     const recipe = await Recipe.aggregate([
-//         { $match: { _id: new mongoose.Types.ObjectId(id) } },
-//         {
-//             $lookup: {
-//                 from: "ratings",
-//                 localField: "ratings",
-//                 foreignField: "_id",
-//                 as: "ratingsData"
-//             }
-//         },
-//         {
-//             $addFields: {
-//                 averageRating: {
-//                     $cond: {
-//                         if: { $gt: [{ $size: "$ratingsData" }, 0] },
-//                         then: { $avg: "$ratingsData.star" },
-//                         else: 0
-//                     }
-//                 },
-//                 totalRatings: { $size: "$ratingsData" }
-//             }
-//         }
-//     ]);
-
-//     if (!recipe.length) {
-//         throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
-//     }
-
-//     try {
-//         await RecentlyViewed.findOneAndUpdate(
-//             { userId: new mongoose.Types.ObjectId(userId), recipeId: new mongoose.Types.ObjectId(id) },
-//             { $set: { createdAt: new Date() } },
-//             { upsert: true, new: true }
-//         );
-//     } catch (error) {
-//         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
-//     }
-//     return recipe[0];
-// };
-
-
 
 
 // delete recipe
@@ -206,6 +159,34 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
+        // Lookup for category
+        {
+            $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "categoryData"
+            }
+        },
+
+        // Lookup for subcategory
+        {
+            $lookup: {
+                from: "subcategories",
+                localField: "subCategory",
+                foreignField: "_id",
+                as: "subCategoryData"
+            }
+        },
+
+        // Unwind the arrays to make it easier to work with (optional, only if you need single objects)
+        {
+            $addFields: {
+                categoryData: { $arrayElemAt: ["$categoryData", 0] },
+                subCategoryData: { $arrayElemAt: ["$subCategoryData", 0] }
+            }
+        },
+
         // Add fields for ratings (average, total)
         {
             $addFields: {
@@ -244,6 +225,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
 
     return recipe[0];
 };
+
 
 
 

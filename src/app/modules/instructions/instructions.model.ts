@@ -6,9 +6,9 @@ const instructionsSchema = new Schema<IInstructions>({
     type: String,
     required: true
   },
-  instructionsImage: {
+  instructions: {
     type: String,
-    required: false
+    required: true
   }
 });
 

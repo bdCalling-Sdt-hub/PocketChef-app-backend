@@ -4,6 +4,8 @@ import fileUploadHandler from '../../middlewares/fileUploaderHandler';
 import { InstructionsValidations } from './instructions.validation';
 import validationRequest from '../../middlewares/validateRequest';
 import { getSingleFilePath } from '../../../shared/getFilePath';
+import ApiError from '../../../errors/ApiErrors';
+import { StatusCodes } from 'http-status-codes';
 const router = express.Router();
 
 // create instruction
@@ -15,7 +17,9 @@ router.post(
 
             if (req.files) {
                 const instructions = getSingleFilePath(req.files, "instructions" as any);
-
+                if (!instructions) {
+                    throw new ApiError(StatusCodes.BAD_REQUEST, "Instructions file is required");
+                }
                 req.body = {
                     ...req.body,
                     instructions,
