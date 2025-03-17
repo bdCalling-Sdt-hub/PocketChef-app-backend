@@ -1,9 +1,9 @@
 import { Model, Types } from 'mongoose';
 
 export type IFavorite = {
-  user: Types.ObjectId;
-  recipe: Types.ObjectId;
-  collection?: Types.ObjectId
+  recipeId: Types.ObjectId;
+  userId?: Types.ObjectId;
+  folderName?: string;
 };
 
 export type FavoriteModel = Model<IFavorite>;

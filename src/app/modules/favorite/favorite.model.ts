@@ -2,21 +2,19 @@ import { Schema, model } from 'mongoose';
 import { IFavorite, FavoriteModel } from './favorite.interface';
 
 const favoriteSchema = new Schema<IFavorite, FavoriteModel>({
-  user: {
+  recipeId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Recipe',
+    required: true
+  },
+  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
-  recipe: {
-    type: Schema.Types.ObjectId,
-    ref: 'recipe',
-    required: true
-  },
-  collection: {
-    type: Schema.Types.ObjectId,
-    ref: 'Collection',
-    required: false,
-    default: null,
+  folderName: {
+    type: String,
+    required: false
   }
 },
   {

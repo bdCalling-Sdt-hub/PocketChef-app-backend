@@ -1,19 +1,20 @@
 import { z } from 'zod';
 
-
-const createFavoritesValidation = z.object({
+const createFavoriteZodSchema = z.object({
     body: z.object({
-        user: z.string({
-            required_error: 'User is required'
-        }),
-        recipe: z.string({
-            required_error: 'Recipe is required'
-        }),
-        collection: z.string().optional()
-    })
-})
+        recipeId: z.string(),
+        folderName: z.string().optional()
+    }),
+});
 
+const updateFavoriteZodSchema = z.object({
+    body: z.object({
+        recipeId: z.string(),
+        folderName: z.string().optional()
+    }),
+});
 
-export const FavoritesValidation = {
-    createFavoritesValidation
+export const FavoriteValidations = {
+    createFavoriteZodSchema,
+    updateFavoriteZodSchema
 };
