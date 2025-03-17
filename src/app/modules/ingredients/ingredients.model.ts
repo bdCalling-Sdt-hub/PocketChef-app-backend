@@ -6,9 +6,7 @@ const ingredientsSchema = new Schema<IIngredients, IngredientsModel>({
   name: { type: String, required: true },
   subName: { type: String, required: true },
   description: { type: String, required: true },
-  preparation: { type: String, required: true },
-  amount: { type: Number, required: true },
-  unit: { type: String, required: true },
+  preparation: { type: String, required: true }
 },
   {
     timestamps: true

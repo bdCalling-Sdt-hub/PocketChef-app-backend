@@ -40,7 +40,31 @@ const getAllSubCategoryIntoDB = async () => {
 
 
 
+// delete subcategory
+const deleteSubcategoryToDB = async (id: string) => {
+    const deleteSubcategory = await Subcategory.findByIdAndDelete(id)
+    if (!deleteSubcategory) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Subcategory not found")
+    }
+    return deleteSubcategory
+}
+
+
+
+// update subcategory
+const updateSubcategoryToDB = async (id: string, payload: ISubcategory) => {
+    console.log(payload);
+    const updateSubcategory = await Subcategory.findByIdAndUpdate(id, payload, { new: true })
+    if (!updateSubcategory) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Subcategory not found")
+    }
+    return updateSubcategory
+}
+
+
 export const SubcategoryServices = {
     createSubCategoryIntoDB,
-    getAllSubCategoryIntoDB
+    getAllSubCategoryIntoDB,
+    deleteSubcategoryToDB,
+    updateSubcategoryToDB
 };

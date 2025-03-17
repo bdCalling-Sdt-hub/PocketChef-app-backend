@@ -13,46 +13,45 @@ import mongoose, { isValidObjectId } from "mongoose";
 const createRecipe = catchAsync(async (req: Request, res: Response) => {
     const recipeData = req.body;
 
-    const parseArrayField = (field: any, fieldName: string, isObjectIdArray = false) => {
-        if (Array.isArray(field)) {
-            return isObjectIdArray
-                ? field.map((id) => new mongoose.Types.ObjectId(id))
-                : field;
-        }
 
-        if (typeof field === "string") {
-            const trimmedField = field.trim();
-
-            if (trimmedField.startsWith("[") && trimmedField.endsWith("]")) {
-                try {
-                    const parsed = JSON.parse(trimmedField);
-                    if (Array.isArray(parsed)) {
-                        return isObjectIdArray
-                            ? parsed.map((id) => new mongoose.Types.ObjectId(id))
-                            : parsed;
-                    }
-                    throw new Error();
-                } catch {
-                    throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid JSON format for ${fieldName}`);
-                }
+    // Parse JSON strings into actual arrays if needed
+    const parseJsonArray = (field: any) => {
+        if (typeof field === 'string') {
+            try {
+                return JSON.parse(field);
+            } catch (e) {
+                return [];
             }
         }
-
-        return [];
+        return field;
     };
 
-    // Handling ObjectId[]
-    recipeData.ingredientName = parseArrayField(recipeData.ingredientName, "ingredientName", true);
-    recipeData.instructions = parseArrayField(recipeData.instructions, "instructions", true);
+    // Parsing stringified arrays into arrays
+    recipeData.keyIngredients = parseJsonArray(recipeData.keyIngredients);
+    recipeData.dietaryPreferences = parseJsonArray(recipeData.dietaryPreferences);
+    recipeData.tags = parseJsonArray(recipeData.tags);
+    recipeData.NutritionalValue = parseJsonArray(recipeData.NutritionalValue);
+    recipeData.ingredientName = parseJsonArray(recipeData.ingredientName);
 
-    // Handling String[]
-    recipeData.keyIngredients = parseArrayField(recipeData.keyIngredients, "keyIngredients");
-    recipeData.dietaryPreferences = parseArrayField(recipeData.dietaryPreferences, "dietaryPreferences");
-    recipeData.tags = parseArrayField(recipeData.tags, "tags");
-    recipeData.NutritionalValue = parseArrayField(recipeData.NutritionalValue, "NutritionalValue");
+    // Handling instructions and ingredientName properly
+    recipeData.instructions = parseJsonArray(recipeData.instructions);
+    recipeData.ingredientName = recipeData.ingredientName.map((ingredient: any) => {
+        try {
+            return {
+                ingredientName: new mongoose.Types.ObjectId(ingredient.ingredientName),
+                amount: ingredient.amount,
+                unit: ingredient.unit
+            };
+        } catch (e) {
+            return null;
+        }
+    }).filter(Boolean);
 
     recipeData.totalTime = Number(recipeData.prepTime) + Number(recipeData.cookTime);
 
+
+
+    // Now, call the service to save the recipe
     const result = await RecipeService.createRecipeIntoDB(recipeData);
 
     sendResponse(res, {
@@ -60,8 +59,11 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
         success: true,
         message: "Recipe created successfully",
         data: result,
-    })
+    });
 });
+
+
+
 
 
 // update recipe for 

@@ -1,40 +1,35 @@
-import mongoose, { model, Schema } from 'mongoose';
-import { IRecipes } from './Recipes.interface';
+import mongoose, { model, Schema, Types } from "mongoose";
+import { IRecipes } from "./Recipes.interface";
 
-// Define the ingredient schema properly
-
-
-// like schema
+// Favorite schema
 const favoriteSchema = new Schema({
     userId: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
 });
 
-
-// comment schema
+// Review schema
 const reviewSchema = new Schema({
     userId: { type: String, required: true },
     username: { type: String, required: true },
     text: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
-    replies: [{ type: Schema.Types.Mixed }]
+    replies: [{ type: Schema.Types.Mixed }],
 });
 
+// Nutritional Value schema
+const NutritionalValueSchema = new Schema({
+    name: { type: String, required: true },
+    Kcal: { type: String, required: true },
+});
 
-// NutritionalValue
+// Ingredient schema
+const ingredientSchema = new Schema({
+    ingredientName: { type: Types.ObjectId, ref: "Ingredients", required: true },
+    amount: { type: Number, required: true },
+    unit: { type: String, required: true },
+});
 
-
-// [
-//     { "name": "Energy", "Kcal": "680 g" },
-//     { "name": "Protein", "Kcal": "28.24g" }
-// ]
-const NutritionalValue = new Schema({
-    name: { type: String, require: true },
-    Kcal: { type: String, require: true }
-})
-
-
-// Define the main recipe schema
+// Recipe Schema
 const recipeSchema = new Schema<IRecipes>(
     {
         image: [{ type: String, required: true }],
@@ -49,40 +44,41 @@ const recipeSchema = new Schema<IRecipes>(
         totalTime: { type: Number, required: false },
         prepTime: { type: Number, required: true },
         cookTime: { type: Number, required: true },
-        instructions: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Instructions',
-            required: true
-        }],
-        ingredientName: [{ type: Schema.Types.ObjectId, ref: "Ingredients", required: true }],
+        instructions: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Instructions",
+                required: true,
+            },
+        ],
+        ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
-        NutritionalValue: [NutritionalValue],
+        NutritionalValue: [NutritionalValueSchema],
         subCategory: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: "Subcategory"
-        }
+            ref: "Subcategory",
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 
-export const Recipe = model<IRecipes>('Recipe', recipeSchema);
+export const Recipe = model<IRecipes>("Recipe", recipeSchema);
 
-
-
+// Recently Viewed Schema
 const RecentlyViewedSchema = new mongoose.Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     recipeId: {
         type: Schema.Types.ObjectId,
         ref: "Recipe",
-        required: true
+        required: true,
     },
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
 export const RecentlyViewed = mongoose.model("RecentlyViewed", RecentlyViewedSchema);

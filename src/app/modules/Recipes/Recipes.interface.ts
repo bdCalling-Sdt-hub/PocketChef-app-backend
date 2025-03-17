@@ -1,14 +1,10 @@
 import { Types } from "mongoose";
 
-// export type IIngredient = {
-//     name: string;
-//     amount: number;
-//     unit: string;
-// };
 export type IFavorite = {
     userId: string;
     timestamp: Date;
 };
+
 export type IReview = {
     userId: string;
     username: string;
@@ -17,8 +13,19 @@ export type IReview = {
     replies?: IReview[];
 };
 
+export type IngredientType = {
+    ingredientName: Types.ObjectId;
+    amount: number;
+    unit: string;
+};
+
+export type NutritionalValueType = {
+    name: string;
+    Kcal: string;
+};
+
 export type IRecipes = {
-    image: string[]
+    image: string[];
     video: string;
     recipeName: string;
     description: string;
@@ -31,12 +38,8 @@ export type IRecipes = {
     cookTime: number;
     totalTime?: number;
     instructions: Types.ObjectId[];
-    ingredientName: Types.ObjectId[];
+    ingredientName: IngredientType[];
     tags: string[];
-    NutritionalValue: string[]
-    subCategory: Types.ObjectId
-    // favorite?: IFavorite[]
-    // review?: IReview[]
-}
-
-
+    NutritionalValue: NutritionalValueType[];
+    subCategory: Types.ObjectId;
+};

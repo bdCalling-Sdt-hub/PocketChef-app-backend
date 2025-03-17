@@ -7,12 +7,13 @@ import mongoose from "mongoose"
 import { IPaginationOptions } from "../../../types/pagination"
 
 const createRecipeIntoDB = async (payload: IRecipes) => {
+    // Ensure that the data has been correctly processed (you may need to adjust this based on your schema)
+    const recipe = await Recipe.create(payload);
+    if (!recipe) throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create recipe');
 
-    const recipes = await Recipe.create(payload)
-    if (!recipes) throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create recipe')
+    return recipe;
+};
 
-    return recipes
-}
 
 const updateRecipeIntoDB = async (id: string, payload: IRecipes, files?: any) => {
     const existingRecipe = await Recipe.findById(id);
@@ -129,17 +130,19 @@ const getSingleRecipe = async (id: string, userId: string) => {
     const recipe = await Recipe.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
 
-        // Lookup for ingredientName
+        // Lookup for ingredientName (Populate ingredients with full details)
         {
             $lookup: {
-                from: "ingredients",
-                localField: "ingredientName",
-                foreignField: "_id",
-                as: "ingredientData"
+                from: "ingredients", // Collection name for ingredients
+                let: { ingredientIds: { $map: { input: "$ingredientName", as: "item", in: "$$item.ingredientName" } } },
+                pipeline: [
+                    { $match: { $expr: { $in: ["$_id", "$$ingredientIds"] } } }
+                ],
+                as: "ingredientNameData"
             }
         },
 
-        // Lookup for instructions
+        // Lookup for instructions (Populating instructions with full data)
         {
             $lookup: {
                 from: "instructions",
@@ -149,7 +152,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Lookup for ratings
+        // Lookup for ratings (if you're calculating average and total ratings)
         {
             $lookup: {
                 from: "ratings",
@@ -179,7 +182,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Unwind the arrays to make it easier to work with (optional, only if you need single objects)
+        // Unwind the arrays to simplify access to single objects
         {
             $addFields: {
                 categoryData: { $arrayElemAt: ["$categoryData", 0] },
@@ -187,7 +190,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Add fields for ratings (average, total)
+        // Add fields for average rating and total ratings count
         {
             $addFields: {
                 averageRating: {
@@ -201,10 +204,46 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Optionally remove raw ratings data if it's not needed in the response
+        // Optionally, you can remove the raw ratings data if not needed
         {
             $project: {
-                ratingsData: 0
+                ratingsData: 0 // Exclude ratingsData from the final output
+            }
+        },
+
+        // Flatten the ingredients data
+        {
+            $addFields: {
+                ingredientName: {
+                    $map: {
+                        input: "$ingredientName",
+                        as: "ingredient",
+                        in: {
+                            $mergeObjects: [
+                                "$$ingredient",
+                                {
+                                    $arrayElemAt: [
+                                        {
+                                            $filter: {
+                                                input: "$ingredientNameData", // Full ingredient data populated
+                                                as: "fullIngredient",
+                                                cond: { $eq: ["$$fullIngredient._id", "$$ingredient.ingredientName"] }
+                                            }
+                                        },
+                                        0 // Pick the first (and only) item from the array
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+
+        // Final projection to remove the ingredientNameData field
+        {
+            $project: {
+                ingredientNameData: 0 // Remove the ingredientNameData field after merging ingredient info
             }
         }
     ]);
@@ -213,18 +252,27 @@ const getSingleRecipe = async (id: string, userId: string) => {
         throw new ApiError(StatusCodes.NOT_FOUND, "Recipe not found");
     }
 
+    // Log the recently viewed recipe for the user
     try {
-        await RecentlyViewed.findOneAndUpdate(
-            { userId: new mongoose.Types.ObjectId(userId), recipeId: new mongoose.Types.ObjectId(id) },
-            { $set: { createdAt: new Date() } },
-            { upsert: true, new: true }
-        );
+        const recentView = await RecentlyViewed.findOne({
+            userId: new mongoose.Types.ObjectId(userId),
+            recipeId: new mongoose.Types.ObjectId(id)
+        });
+
+        if (!recentView) {
+            await RecentlyViewed.create({
+                userId: new mongoose.Types.ObjectId(userId),
+                recipeId: new mongoose.Types.ObjectId(id),
+                createdAt: new Date()
+            });
+        }
     } catch (error) {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
     }
 
     return recipe[0];
 };
+
 
 
 

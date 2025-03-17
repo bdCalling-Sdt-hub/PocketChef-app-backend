@@ -39,7 +39,7 @@ const fileUploadHandler = () => {
                     uploadDir = path.join(baseUploadDir, "bannerImages")
                     break
                 case "ingredientImages":
-                    uploadDir = path.join(baseUploadDir, "ingredientImage")
+                    uploadDir = path.join(baseUploadDir, "ingredientImages")
                     break
                 default:
                     return cb(new Error('File type is not supported'), '');

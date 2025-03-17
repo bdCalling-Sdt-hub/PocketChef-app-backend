@@ -8,9 +8,7 @@ const createIngredientsZodSchema = z.object({
         name: z.string(),
         subName: z.string(),
         description: z.string(),
-        preparation: z.string(),
-        amount: z.union([z.string(), z.number()]).transform((val) => Number(val)),
-        unit: z.string(),
+        preparation: z.string()
     }),
 });
 
