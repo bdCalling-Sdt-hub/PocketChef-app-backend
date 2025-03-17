@@ -133,6 +133,14 @@ const getSingleRecipe = async (id: string, userId: string) => {
         // Lookup for ingredientName (Populate ingredients with full details)
         {
             $lookup: {
+                from: "ratings",
+                localField: "_id",
+                foreignField: "recipeId",
+                as: "reviewData"
+            }
+        },
+        {
+            $lookup: {
                 from: "ingredients", // Collection name for ingredients
                 let: { ingredientIds: { $map: { input: "$ingredientName", as: "item", in: "$$item.ingredientName" } } },
                 pipeline: [
@@ -207,7 +215,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
         // Optionally, you can remove the raw ratings data if not needed
         {
             $project: {
-                ratingsData: 0 // Exclude ratingsData from the final output
+                ratingsData: 0
             }
         },
 
