@@ -141,7 +141,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
         },
         {
             $lookup: {
-                from: "ingredients", // Collection name for ingredients
+                from: "ingredients",
                 let: { ingredientIds: { $map: { input: "$ingredientName", as: "item", in: "$$item.ingredientName" } } },
                 pipeline: [
                     { $match: { $expr: { $in: ["$_id", "$$ingredientIds"] } } }
