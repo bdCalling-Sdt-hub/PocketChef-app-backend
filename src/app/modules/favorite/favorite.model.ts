@@ -3,7 +3,7 @@ import { IFavorite, FavoriteModel } from './favorite.interface';
 
 const favoriteSchema = new Schema<IFavorite, FavoriteModel>({
   recipeId: {
-    type: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     ref: 'Recipe',
     required: true
   },

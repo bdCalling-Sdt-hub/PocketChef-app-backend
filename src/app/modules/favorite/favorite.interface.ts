@@ -1,7 +1,7 @@
 import { Model, Types } from 'mongoose';
 
 export type IFavorite = {
-  recipeId: Types.ObjectId;
+  recipeId: Types.ObjectId[];
   userId?: Types.ObjectId;
   folderName?: string;
 };

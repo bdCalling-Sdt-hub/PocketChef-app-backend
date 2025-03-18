@@ -18,9 +18,7 @@ const updateIngredientsZodSchema = z.object({
         name: z.string(),
         subName: z.string(),
         description: z.string(),
-        preparation: z.string(),
-        amount: z.number(),
-        unit: z.string(),
+        preparation: z.string()
     }),
 });
 export const IngredientsValidations = {

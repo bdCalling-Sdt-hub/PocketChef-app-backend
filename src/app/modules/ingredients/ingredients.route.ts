@@ -51,7 +51,7 @@ router.get('/', IngredientsController.getAllIngredients);
 
 router.get('/:id', IngredientsController.getSingleIngredients);
 
-router.put('/:id',
+router.patch('/:id',
     fileUploadHandler() as any,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -62,7 +62,6 @@ router.put('/:id',
             const payload = req.body;
 
             const ingredientImages = getSingleFilePath(req.files, 'ingredientImages' as any);
-
             req.body = {
                 ingredientImages,
                 name: payload.name,

@@ -11,7 +11,7 @@ const addToGrocery = catchAsync(async (req: Request, res: Response) => {
     // @ts-ignore
     const userId = req.user?.id; // User ID from token
 
-    const result = await AddtogroceryServices.addToGrocery({ recipe, user: userId });
+    const result = await AddtogroceryServices.addToGrocery({ recipe, userId });
 
     res.status(StatusCodes.CREATED).json({
         success: true,

@@ -5,7 +5,6 @@ import { Favorite } from './favorite.model';
 
 const createFavoriteIntoDB = async (payload: IFavorite) => {
     const favorite = await Favorite.create(payload)
-    console.log("favorite", favorite);
     if (!favorite) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Favorite')
     }

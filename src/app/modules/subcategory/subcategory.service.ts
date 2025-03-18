@@ -52,7 +52,6 @@ const deleteSubcategoryToDB = async (id: string) => {
 
 // update subcategory
 const updateSubcategoryToDB = async (id: string, payload: ISubcategory) => {
-    console.log(payload);
     const updateSubcategory = await Subcategory.findByIdAndUpdate(id, payload, { new: true })
     if (!updateSubcategory) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Subcategory not found")

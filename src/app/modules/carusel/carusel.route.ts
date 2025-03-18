@@ -16,8 +16,7 @@ router.post("/",
             }
             const payload = req.body;
             const bannerImages = getSingleFilePath(req.files, 'bannerImages' as any);
-            console.log(payload);
-            console.log(bannerImages);
+
             req.body = {
                 bannerImages,
                 ...payload

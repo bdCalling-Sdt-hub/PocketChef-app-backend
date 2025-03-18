@@ -18,6 +18,7 @@ import { IngredientsRoutes } from '../modules/ingredients/ingredients.route';
 import { RecommendedRoutes } from '../modules/recommended/recommended.route';
 import { AddtogroceryRoutes } from '../modules/addtogrocery/addtogrocery.route';
 import { FavoriteRoutes } from '../modules/favorite/favorite.route';
+import { RecentfavoratesRoutes } from '../modules/recentfavorates/recentfavorates.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -63,6 +64,10 @@ const apiRoutes = [
     {
         path: "/favorite",
         route: FavoriteRoutes
+    },
+    {
+        path: "/recentfavorites",
+        route: RecentfavoratesRoutes
     }
 ]
 

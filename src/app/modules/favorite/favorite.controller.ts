@@ -14,7 +14,6 @@ const createFavorite = catchAsync(async (req: Request, res: Response) => {
         ...req.body,
         userId
     };
-    console.log("favoriteData", favoriteData);
     const result = await FavoriteServices.createFavoriteIntoDB(favoriteData)
 
     sendResponse(res, {
