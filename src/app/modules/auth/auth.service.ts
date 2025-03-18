@@ -181,7 +181,7 @@ const resetPasswordToDB = async (token: string, payload: IAuthResetPassword) => 
 
 const changePasswordToDB = async (user: JwtPayload, payload: IChangePassword) => {
 
-    const { currentPassword, newPassword, confirmPassword } = payload;
+    const { currentPassword, newPassword } = payload;
     const isExistUser = await User.findById(user.id).select('+password');
     if (!isExistUser) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -405,8 +405,13 @@ const verifyOTP = async (email: string, otp: number) => {
         { _id: user._id },
         { verified: true, authentication: { oneTimeCode: null, expireAt: null } }
     );
+    const token = jwtHelper.createToken(
+        { id: user._id, role: user.role, email: user.email },
+        config.jwt.jwt_secret as Secret,
+        config.jwt.jwt_expire_in as string
+    );
 
-    return { message: 'Email verified successfully!' };
+    return { message: 'Login successful!', token };
 };
 
 // ban user from admin account 

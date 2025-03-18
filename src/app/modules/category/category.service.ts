@@ -28,23 +28,24 @@ const getCategoriesFromDB = async (): Promise<ICategory[]> => {
   return result;
 }
 
-const updateCategoryToDB = async (id: string, payload: ICategory) => {
-  const isExistCategory: any = await Category.findById(id);
-
-  if (!isExistCategory) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Category doesn't exist");
+const updateCategoryToDB = async (id: string, data: ICategory) => {
+  // Check if category exists before updating
+  const category = await Category.findById(id);
+  if (!category) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Category not found');
   }
 
-  if (payload.category) {
-    unlinkFile(isExistCategory?.image);
+  // Update category in DB
+  const updatedCategory = await Category.findByIdAndUpdate(id, data, { new: true });
+
+  // Handle errors if update fails
+  if (!updatedCategory) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update Category');
   }
 
-  const updateCategory = await Category.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  })
+  return updatedCategory;
+};
 
-  return updateCategory
-}
 
 const deleteCategoryToDB = async (id: string): Promise<ICategory | null> => {
   const deleteCategory = await Category.findByIdAndDelete(id)

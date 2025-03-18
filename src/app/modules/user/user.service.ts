@@ -1,6 +1,6 @@
 import { USER_ROLES } from "../../../enums/user";
 import { IUser } from "./user.interface";
-import { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload, Secret } from 'jsonwebtoken';
 import { User } from "./user.model";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
@@ -8,6 +8,8 @@ import generateOTP from "../../../util/generateOTP";
 import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
+import { config } from "dotenv";
+import { jwtHelper } from "../../../helpers/jwtHelper";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
 
@@ -116,10 +118,14 @@ const verifyOtp = async (email: string, otp: number): Promise<boolean> => {
     user.authentication = undefined;
     await user.save();
 
-    return true;
+    const token = jwtHelper.createToken(
+        { id: user._id, role: user.role, email: user.email },
+        process.env.JWT_SECRET as Secret,
+        process.env.JWT_EXPIRE_IN as string
+    );
+
+    return { message: 'Email verified successfully!', token };
 };
-
-
 
 
 export const UserService = {

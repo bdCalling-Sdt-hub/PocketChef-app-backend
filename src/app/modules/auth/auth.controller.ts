@@ -159,6 +159,7 @@ const verifyOTP = catchAsync(async (req: Request, res: Response) => {
         success: true,
         statusCode: StatusCodes.OK,
         message: result.message,
+        data: result.token
     });
 });
 

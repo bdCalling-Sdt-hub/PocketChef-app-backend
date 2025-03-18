@@ -3,20 +3,17 @@ import { StatusCodes } from 'http-status-codes'
 import catchAsync from '../../../shared/catchAsync'
 import sendResponse from '../../../shared/sendResponse'
 import { CategoryService } from './category.service'
+import unlinkFile from '../../../shared/unlinkFile'
+import { getSingleFilePath } from '../../../shared/getFilePath'
 
 const createCategory = catchAsync(async (req: Request, res: Response) => {
   const serviceData = req.body;
 
-  let category = "";
-
-  if (req.files && "category" in req.files && Array.isArray(req.files.category) && req.files.category.length > 0) {
-    category = `/category/${req.files.category[0].filename}`;
-  }
+  const categoryFilePath = getSingleFilePath(req.files, 'category' as any);
   const data = {
     ...serviceData,
-    category,
+    category: categoryFilePath,
   };
-
   const result = await CategoryService.createCategoryToDB(data)
 
   sendResponse(res, {
@@ -42,24 +39,34 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id
   const updateCategoryData = req.body;
 
-  let image;
-  if (req.files && "image" in req.files && req.files.image[0]) {
-    image = `/images/${req.files.image[0].filename}`;
-  }
+  const categoryFilePath = getSingleFilePath(req.files, 'category' as any);
+
   const data = {
     ...updateCategoryData,
-    image
+    category: categoryFilePath || updateCategoryData.oldCategory,
   };
+  try {
+    // If a new file is uploaded, remove the old file
+    if (categoryFilePath && updateCategoryData.oldCategory) {
+      unlinkFile(updateCategoryData.oldCategory);
+    }
 
-  const result = await CategoryService.updateCategoryToDB(id, data)
+    const result = await CategoryService.updateCategoryToDB(id, data);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Category updated successfully',
-    data: result,
-  })
-})
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Category updated successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      success: false,
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: 'Failed to update category',
+    });
+  }
+});
 
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id

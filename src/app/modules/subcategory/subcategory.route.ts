@@ -5,7 +5,9 @@ import { USER_ROLES } from '../../../enums/user';
 
 const router = express.Router();
 
-router.post('/create', auth(USER_ROLES.ADMIN), SubcategoryController.createSubCategory);
+router.post('/create',
+    auth(USER_ROLES.ADMIN),
+    SubcategoryController.createSubCategory);
 router.get("/", SubcategoryController.getAllSubCategory)
 
 router.delete("/:id", auth(USER_ROLES.ADMIN), SubcategoryController.deleteSubcategory)

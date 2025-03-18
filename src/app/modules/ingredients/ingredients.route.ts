@@ -10,21 +10,17 @@ const router = express.Router();
 
 
 router.post('/',
-    fileUploadHandler() as any, // File upload middleware
+    fileUploadHandler() as any,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.files) {
                 throw new Error('No files uploaded');
             }
 
-            // Extract payload from FormData
             const payload = req.body;
 
-            // Get the image path
-            // @ts-ignore
             const ingredientImages = getSingleFilePath(req.files, 'ingredientImages' as any);
 
-            // Convert FormData to JSON manually
             req.body = {
                 ingredientImages,
                 name: payload.name,
@@ -63,14 +59,10 @@ router.put('/:id',
                 throw new Error('No files uploaded');
             }
 
-            // Extract payload from FormData
             const payload = req.body;
 
-            // Get the image path
-            // @ts-ignore
             const ingredientImages = getSingleFilePath(req.files, 'ingredientImages' as any);
 
-            // Convert FormData to JSON manually
             req.body = {
                 ingredientImages,
                 name: payload.name,

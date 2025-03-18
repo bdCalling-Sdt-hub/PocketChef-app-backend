@@ -24,8 +24,7 @@ const createSubCategoryIntoDB = async (payload: ISubcategory) => {
 
         return subcategory;
     } catch (error) {
-
-        throw error;
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create subcategory");
     }
 };
 

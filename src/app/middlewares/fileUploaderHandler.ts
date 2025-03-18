@@ -30,7 +30,7 @@ const fileUploadHandler = () => {
                     uploadDir = path.join(baseUploadDir, 'profiles');
                     break;
                 case "category":
-                    uploadDir = path.join(baseUploadDir, "categorys")
+                    uploadDir = path.join(baseUploadDir, "category")
                     break
                 case "instructions":
                     uploadDir = path.join(baseUploadDir, "instructions")
