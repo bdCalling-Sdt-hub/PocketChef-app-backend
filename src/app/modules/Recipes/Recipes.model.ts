@@ -8,13 +8,13 @@ const favoriteSchema = new Schema({
 });
 
 // Review schema
-const reviewSchema = new Schema({
-    userId: { type: String, required: true },
-    username: { type: String, required: true },
-    text: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now },
-    replies: [{ type: Schema.Types.Mixed }],
-});
+// const reviewSchema = new Schema({
+//     userId: { type: String, required: true },
+//     username: { type: String, required: true },
+//     text: { type: String, required: true },
+//     timestamp: { type: Date, default: Date.now },
+//     replies: [{ type: Schema.Types.Mixed }],
+// });
 
 // Nutritional Value schema
 const NutritionalValueSchema = new Schema({

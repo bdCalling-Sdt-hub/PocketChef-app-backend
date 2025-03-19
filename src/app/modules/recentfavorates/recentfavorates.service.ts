@@ -34,7 +34,18 @@ const createRecentfavoratesIntoDB = async (payload: IRecentfavorates) => {
 };
 
 
+// get all
+const getAllRecentFavortesIntoDB = async () => {
+    const result = await Recentfavorates.find({}).populate('recipeId');
+    if (!result) {
+        return []
+    }
+    return result
+}
+
+
 
 export const RecentfavoratesServices = {
-    createRecentfavoratesIntoDB
+    createRecentfavoratesIntoDB,
+    getAllRecentFavortesIntoDB
 };

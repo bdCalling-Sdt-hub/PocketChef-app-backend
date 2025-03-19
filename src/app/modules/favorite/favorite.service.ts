@@ -12,7 +12,7 @@ const createFavoriteIntoDB = async (payload: IFavorite) => {
 }
 
 const getAllFavoriteIntoDB = async (userId: string) => {
-    const favorite = await Favorite.find({ userId })
+    const favorite = await Favorite.find({ userId }).populate('recipeId');
     if (!favorite) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Favorite not found')
     }
@@ -20,7 +20,7 @@ const getAllFavoriteIntoDB = async (userId: string) => {
 }
 
 const getSingleFavoriteIntoDB = async (id: string) => {
-    const favorite = await Favorite.findById(id)
+    const favorite = await Favorite.findById(id).populate('recipeId');
     if (!favorite) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Favorite not found')
     }

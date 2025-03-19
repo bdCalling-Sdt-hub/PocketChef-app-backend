@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 
 
 const createRecentFavorites = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // @ts-ignore
     const userId = req.user?.id;
 
     // Ensure userId exists
@@ -37,6 +38,20 @@ const createRecentFavorites = catchAsync(async (req: Request, res: Response, nex
     });
 });
 
+
+const getAllRecentFavorites = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await RecentfavoratesServices.getAllRecentFavortesIntoDB();
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Recent favorites fetched successfully',
+        data: result,
+    });
+});
+
+
+
 export const RecentfavoratesController = {
-    createRecentFavorites
+    createRecentFavorites,
+    getAllRecentFavorites
 };
