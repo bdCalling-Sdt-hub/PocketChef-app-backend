@@ -23,6 +23,11 @@ export type NutritionalValueType = {
     name: string;
     Kcal: string;
 };
+export type IInstruction = {
+    instruction: string;
+    image: string[];
+};
+
 
 export type IRecipes = {
     image: string[];
@@ -32,12 +37,12 @@ export type IRecipes = {
     portionSize: number;
     selectLevel: "Easy" | "Medium" | "Hard";
     category: Types.ObjectId;
-    keyIngredients: string[];
-    dietaryPreferences: string[];
+    keyIngredients?: string[];
+    dietaryPreferences?: string[];
     prepTime: number;
     cookTime: number;
     totalTime?: number;
-    instructions: Types.ObjectId[];
+    instructions: IInstruction[];
     ingredientName: IngredientType[];
     tags: string[];
     NutritionalValue: NutritionalValueType[];

@@ -22,11 +22,19 @@ const NutritionalValueSchema = new Schema({
     Kcal: { type: String, required: true },
 });
 
+
+
 // Ingredient schema
 const ingredientSchema = new Schema({
     ingredientName: { type: Types.ObjectId, ref: "Ingredients", required: true },
     amount: { type: Number, required: true },
     unit: { type: String, required: true },
+});
+
+// Instruction schema
+const instructionSchema = new Schema({
+    instruction: { type: String, required: true },
+    image: { type: [String], required: true },
 });
 
 // Recipe Schema
@@ -39,18 +47,12 @@ const recipeSchema = new Schema<IRecipes>(
         portionSize: { type: Number, required: true },
         selectLevel: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
         category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-        keyIngredients: [{ type: String, required: true }],
+        keyIngredients: [{ type: String, required: false }],
         dietaryPreferences: [{ type: String, required: false }],
         totalTime: { type: Number, required: false },
         prepTime: { type: Number, required: true },
         cookTime: { type: Number, required: true },
-        instructions: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Instructions",
-                required: true,
-            },
-        ],
+        instructions: [instructionSchema],
         ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
         NutritionalValue: [NutritionalValueSchema],
