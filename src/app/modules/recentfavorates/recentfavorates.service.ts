@@ -6,18 +6,18 @@ import { StatusCodes } from 'http-status-codes';
 
 
 
-const createRecentfavoratesIntoDB = async (payload: IRecentfavorates) => {
+const createRecentFevoratesIntoDB = async (payload: IRecentfavorates) => {
     // Check if the recent favorite already exists in the database
     const existingFavorite = await Recentfavorates.findOne({
         recipeId: payload.recipeId,
-        userId: payload.userId,  // Ensure this matches the user and recipe combination
+        userId: payload.userId,
     });
 
     // If the favorite exists, remove it (unlike)
     if (existingFavorite) {
         await Recentfavorates.deleteOne({
             recipeId: payload.recipeId,
-            userId: payload.userId,  // Ensure it is the correct record to remove
+            userId: payload.userId,
         });
 
         return { message: 'Removed from favorites', success: true };
@@ -46,6 +46,6 @@ const getAllRecentFavortesIntoDB = async () => {
 
 
 export const RecentfavoratesServices = {
-    createRecentfavoratesIntoDB,
+    createRecentFevoratesIntoDB,
     getAllRecentFavortesIntoDB
 };

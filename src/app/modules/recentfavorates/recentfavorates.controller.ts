@@ -27,7 +27,7 @@ const createRecentFavorites = catchAsync(async (req: Request, res: Response, nex
     };
 
     // Call the service function to toggle favorite
-    const result = await RecentfavoratesServices.createRecentfavoratesIntoDB(recentfavoratesData);
+    const result = await RecentfavoratesServices.createRecentFevoratesIntoDB(recentfavoratesData);
 
     // Send the response back to the client
     sendResponse(res, {
