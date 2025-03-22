@@ -8,9 +8,6 @@ const createRatingZodSchema = z.object({
         comment: z.string({
             required_error: 'Comment is required',
         }),
-        userId: z.string({
-            required_error: 'User ID is required',
-        }),
         recipeId: z.string({
             required_error: 'Recipe ID is required',
         }),

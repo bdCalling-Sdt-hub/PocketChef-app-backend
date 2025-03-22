@@ -10,16 +10,39 @@ const totalUserFromDB = async () => {
     }
     return result;
 }
+const totalData = async () => {
+    const users = await User.find({});
+    const recipes = await Recipe.find({});
+
+    // Get new users for current month
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const newUsers = users.filter((user) => {
+        // @ts-ignore
+        const userCreatedAt = new Date(user.createdAt);
+        return userCreatedAt >= firstDayOfMonth;
+    });
+
+    return {
+        totalUsers: users.length,
+        newUsersThisMonth: newUsers.length,
+        totalRecipes: recipes.length
+    };
+}
+
 
 
 const totalNewUserFromDB = async () => {
+    const currentYear = new Date().getFullYear();
+
     const result = await User.aggregate([
         {
+            $match: { createdAt: { $gte: new Date(`${currentYear}-01-01`), $lt: new Date(`${currentYear + 1}-01-01`) } }
+        },
+        {
             $group: {
-                _id: {
-                    month: { $month: "$createdAt" },
-                    year: { $year: "$createdAt" }
-                },
+                _id: { month: { $month: "$createdAt" } },
                 count: { $sum: 1 }
             }
         },
@@ -27,56 +50,41 @@ const totalNewUserFromDB = async () => {
             $project: {
                 _id: 0,
                 month: {
-                    $switch: {
-                        branches: [
-                            { case: { $eq: ["$_id.month", 1] }, then: "January" },
-                            { case: { $eq: ["$_id.month", 2] }, then: "February" },
-                            { case: { $eq: ["$_id.month", 3] }, then: "March" },
-                            { case: { $eq: ["$_id.month", 4] }, then: "April" },
-                            { case: { $eq: ["$_id.month", 5] }, then: "May" },
-                            { case: { $eq: ["$_id.month", 6] }, then: "June" },
-                            { case: { $eq: ["$_id.month", 7] }, then: "July" },
-                            { case: { $eq: ["$_id.month", 8] }, then: "August" },
-                            { case: { $eq: ["$_id.month", 9] }, then: "September" },
-                            { case: { $eq: ["$_id.month", 10] }, then: "October" },
-                            { case: { $eq: ["$_id.month", 11] }, then: "November" },
-                            { case: { $eq: ["$_id.month", 12] }, then: "December" }
-                        ]
-                    }
+                    $arrayElemAt: [
+                        [
+                            "January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December"
+                        ],
+                        { $subtract: ["$_id.month", 1] }
+                    ]
                 },
-                year: "$_id.year",
                 count: 1
             }
         },
         {
-            $sort: { year: -1, "_id.month": -1 }
+            $sort: { "_id.month": 1 }
         }
     ]);
 
-    if (!result || result.length === 0) {
-        return [];
-    }
-
-    // Create array of all months
+    // Create complete dataset with 0 counts for missing months
     const months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
 
-    // Create complete dataset with 0 counts for missing months
-    const completeData = months.map(month => {
-        // @ts-ignore
-        const found = result.find(r => r.month === month && r.year === currentYear);
+    const completeData = months.map((month, index) => {
+        const found = result.find(r => r.month === month);
         return {
             month,
-            // @ts-ignore
             year: currentYear,
             count: found ? found.count : 0
         };
     });
 
     return completeData;
-}
+};
+
+
 
 const totalRecipeFromDB = async () => {
     const result = await Recipe.find({});
@@ -131,5 +139,6 @@ export const DashboardServices = {
     totalNewUserFromDB,
     totalRecipeFromDB,
     totalRecommendationRecipeFromDB,
-    RecentViewRecipeFromDB
+    RecentViewRecipeFromDB,
+    totalData
 };

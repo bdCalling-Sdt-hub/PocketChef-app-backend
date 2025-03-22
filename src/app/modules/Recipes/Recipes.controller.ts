@@ -27,14 +27,11 @@ const createRecipe = catchAsync(async (req: Request, res: Response) => {
     };
 
     // Parsing stringified arrays into arrays
-    recipeData.keyIngredients = parseJsonArray(recipeData.keyIngredients);
-    recipeData.dietaryPreferences = parseJsonArray(recipeData.dietaryPreferences);
+
     recipeData.tags = parseJsonArray(recipeData.tags);
     recipeData.NutritionalValue = parseJsonArray(recipeData.NutritionalValue);
     recipeData.ingredientName = parseJsonArray(recipeData.ingredientName);
 
-    // Handling instructions and ingredientName properly
-    recipeData.instructions = parseJsonArray(recipeData.instructions);
     recipeData.ingredientName = recipeData.ingredientName.map((ingredient: any) => {
         try {
             return {

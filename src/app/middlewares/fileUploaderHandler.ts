@@ -1,6 +1,5 @@
 import { Request } from 'express';
 import fs from 'fs';
-import { StatusCodes } from 'http-status-codes';
 import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 
@@ -19,6 +18,7 @@ const fileUploadHandler = () => {
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
             let uploadDir;
+            console.log(`Uploading field: ${file.fieldname}`);
             switch (file.fieldname) {
                 case 'image':
                     uploadDir = path.join(baseUploadDir, 'images');
@@ -40,6 +40,9 @@ const fileUploadHandler = () => {
                     break
                 case "ingredientImages":
                     uploadDir = path.join(baseUploadDir, "ingredientImages")
+                    break
+                case "instructionImages":
+                    uploadDir = path.join(baseUploadDir, "instructionImages")
                     break
                 default:
                     return cb(new Error('File type is not supported'), '');
@@ -81,6 +84,8 @@ const fileUploadHandler = () => {
             cb(null, true);
         } else if (file.fieldname === 'ingredientImages' && allowedImageTypes.includes(file.mimetype)) {
             cb(null, true);
+        } else if (file.fieldname === 'instructionImages' && allowedImageTypes.includes(file.mimetype)) {
+            cb(null, true);
         } else {
             cb(null, false);
         }
@@ -99,7 +104,8 @@ const fileUploadHandler = () => {
         { name: 'category', maxCount: 1 },
         { name: 'instructions', maxCount: 1 },
         { name: 'bannerImages', maxCount: 1 },
-        { name: 'ingredientImages', maxCount: 1 }
+        { name: 'ingredientImages', maxCount: 1 },
+        { name: 'instructionImages', maxCount: 1 }
     ]);
 };
 

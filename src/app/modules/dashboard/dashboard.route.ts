@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/total-user', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), DashboardController.totalUser);
 router.get('/total-new-user', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), DashboardController.totalNewUser);
 router.get('/total-recipe', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), DashboardController.totalRecipe);
-
+router.get('/total-data', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), DashboardController.totalData);
 // ! todo: it's not work after create recipe from admin panel than it's work
 router.get('/recommendation-recipe', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), DashboardController.totalRecommendationRecipe);
 

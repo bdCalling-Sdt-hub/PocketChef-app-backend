@@ -1,20 +1,6 @@
 import mongoose, { model, Schema, Types } from "mongoose";
 import { IRecipes } from "./Recipes.interface";
 
-// Favorite schema
-const favoriteSchema = new Schema({
-    userId: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now },
-});
-
-// Review schema
-// const reviewSchema = new Schema({
-//     userId: { type: String, required: true },
-//     username: { type: String, required: true },
-//     text: { type: String, required: true },
-//     timestamp: { type: Date, default: Date.now },
-//     replies: [{ type: Schema.Types.Mixed }],
-// });
 
 // Nutritional Value schema
 const NutritionalValueSchema = new Schema({
@@ -32,10 +18,10 @@ const ingredientSchema = new Schema({
 });
 
 // Instruction schema
-const instructionSchema = new Schema({
-    instruction: { type: String, required: true },
-    image: { type: [String], required: true },
-});
+// const instructionSchema = new Schema({
+//     instruction: { type: String, required: true },
+//     instructionImages: { type: String, required: true },
+// });
 
 // Recipe Schema
 const recipeSchema = new Schema<IRecipes>(
@@ -47,14 +33,14 @@ const recipeSchema = new Schema<IRecipes>(
         portionSize: { type: Number, required: true },
         selectLevel: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
         category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-        keyIngredients: [{ type: String, required: false }],
-        dietaryPreferences: [{ type: String, required: false }],
+        // keyIngredients: [{ type: String, required: false }],
+        // dietaryPreferences: [{ type: String, required: false }],
         totalTime: { type: Number, required: false },
         prepTime: { type: Number, required: true },
         cookTime: { type: Number, required: true },
-        instructions: [instructionSchema],
         ingredientName: [ingredientSchema],
         tags: [{ type: String, required: false }],
+        instructions: [String],
         NutritionalValue: [NutritionalValueSchema],
         subCategory: {
             type: Schema.Types.ObjectId,

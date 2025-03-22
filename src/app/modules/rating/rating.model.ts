@@ -13,7 +13,7 @@ const ratingSchema = new Schema<IRating, ratingModel>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false,
   },
   recipeId: {
     type: Schema.Types.ObjectId,

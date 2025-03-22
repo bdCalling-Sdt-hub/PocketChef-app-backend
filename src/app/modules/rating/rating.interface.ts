@@ -3,7 +3,7 @@ import { Model, Types } from 'mongoose';
 export type IRating = {
   star: Number
   comment: string
-  userId: Types.ObjectId
+  userId?: Types.ObjectId
   recipeId: Types.ObjectId
 };
 

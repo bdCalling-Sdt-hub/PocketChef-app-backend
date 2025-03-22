@@ -61,10 +61,20 @@ const RecentViewRecipe = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const totalData = catchAsync(async (req: Request, res: Response) => {
+    const result = await DashboardServices.totalData();
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Total Data fetched successfully',
+        data: result
+    })
+})
 export const DashboardController = {
     totalUser,
     totalNewUser,
     totalRecipe,
     totalRecommendationRecipe,
-    RecentViewRecipe
+    RecentViewRecipe,
+    totalData
 };

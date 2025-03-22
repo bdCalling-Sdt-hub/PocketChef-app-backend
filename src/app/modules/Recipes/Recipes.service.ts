@@ -8,6 +8,10 @@ import { IPaginationOptions } from "../../../types/pagination"
 
 const createRecipeIntoDB = async (payload: IRecipes) => {
     // Ensure that the data has been correctly processed (you may need to adjust this based on your schema)
+
+    if (payload.video && payload.video.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Video is required');
+    }
     const recipe = await Recipe.create(payload);
     if (!recipe) throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create recipe');
 
@@ -130,7 +134,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
     const recipe = await Recipe.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
 
-        // Lookup for ingredientName (Populate ingredients with full details)
+        // Lookup for ratings (including the comment and star)
         {
             $lookup: {
                 from: "ratings",
@@ -139,6 +143,44 @@ const getSingleRecipe = async (id: string, userId: string) => {
                 as: "reviewData"
             }
         },
+
+        // Lookup for user details for each review (we assume 'users' is your user collection)
+        {
+            $lookup: {
+                from: "users", // The 'users' collection
+                localField: "reviewData.userId", // Field in the 'reviewData' array
+                foreignField: "_id", // The '_id' field in the 'users' collection
+                as: "reviewUserDetails" // This will create a new array field with user details for each review
+            }
+        },
+
+        // Unwind reviewUserDetails to merge user details into the reviewData array
+        {
+            $unwind: {
+                path: "$reviewUserDetails",
+                preserveNullAndEmptyArrays: true // This allows reviews without user data to still be included
+            }
+        },
+
+        // Add user details directly inside reviewData
+        {
+            $addFields: {
+                "reviewData": {
+                    $map: {
+                        input: "$reviewData",
+                        as: "review",
+                        in: {
+                            $mergeObjects: [
+                                "$$review", // Merge existing review data
+                                { userDetails: "$reviewUserDetails" } // Add user details to the review
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+
+        // Lookup for ingredients and merge ingredient data
         {
             $lookup: {
                 from: "ingredients",
@@ -150,7 +192,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Lookup for instructions (Populating instructions with full data)
+        // Lookup for instructions
         {
             $lookup: {
                 from: "instructions",
@@ -160,17 +202,7 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Lookup for ratings (if you're calculating average and total ratings)
-        {
-            $lookup: {
-                from: "ratings",
-                localField: "ratings",
-                foreignField: "_id",
-                as: "ratingsData"
-            }
-        },
-
-        // Lookup for category
+        // Lookup for category and subcategory
         {
             $lookup: {
                 from: "categories",
@@ -179,8 +211,6 @@ const getSingleRecipe = async (id: string, userId: string) => {
                 as: "categoryData"
             }
         },
-
-        // Lookup for subcategory
         {
             $lookup: {
                 from: "subcategories",
@@ -190,36 +220,23 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Unwind the arrays to simplify access to single objects
+        // Unwind and add fields
         {
             $addFields: {
                 categoryData: { $arrayElemAt: ["$categoryData", 0] },
-                subCategoryData: { $arrayElemAt: ["$subCategoryData", 0] }
-            }
-        },
-
-        // Add fields for average rating and total ratings count
-        {
-            $addFields: {
+                subCategoryData: { $arrayElemAt: ["$subCategoryData", 0] },
                 averageRating: {
                     $cond: {
-                        if: { $gt: [{ $size: "$ratingsData" }, 0] },
-                        then: { $avg: "$ratingsData.star" },
+                        if: { $gt: [{ $size: "$reviewData" }, 0] },
+                        then: { $avg: "$reviewData.star" },
                         else: 0
                     }
                 },
-                totalRatings: { $size: "$ratingsData" }
+                totalRatings: { $size: "$reviewData" }
             }
         },
 
-        // Optionally, you can remove the raw ratings data if not needed
-        {
-            $project: {
-                ratingsData: 0
-            }
-        },
-
-        // Flatten the ingredients data
+        // Format ingredients with full data
         {
             $addFields: {
                 ingredientName: {
@@ -233,12 +250,12 @@ const getSingleRecipe = async (id: string, userId: string) => {
                                     $arrayElemAt: [
                                         {
                                             $filter: {
-                                                input: "$ingredientNameData", // Full ingredient data populated
+                                                input: "$ingredientNameData",
                                                 as: "fullIngredient",
                                                 cond: { $eq: ["$$fullIngredient._id", "$$ingredient.ingredientName"] }
                                             }
                                         },
-                                        0 // Pick the first (and only) item from the array
+                                        0
                                     ]
                                 }
                             ]
@@ -248,10 +265,12 @@ const getSingleRecipe = async (id: string, userId: string) => {
             }
         },
 
-        // Final projection to remove the ingredientNameData field
+        // Optionally, remove unnecessary fields
         {
             $project: {
-                ingredientNameData: 0 // Remove the ingredientNameData field after merging ingredient info
+                ingredientNameData: 0, // Remove populated ingredientName data from the final response
+                reviewUserDetails: 0,
+                instructionsData: 0,
             }
         }
     ]);
@@ -278,8 +297,16 @@ const getSingleRecipe = async (id: string, userId: string) => {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Error logging Recently Viewed");
     }
 
-    return recipe[0];
+    return {
+        success: true,
+        message: "Single Recipe retrieved successfully",
+        data: recipe[0]
+    };
 };
+
+
+
+
 
 
 
