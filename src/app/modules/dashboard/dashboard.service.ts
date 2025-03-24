@@ -1,6 +1,6 @@
 import { rating } from '../rating/rating.model';
 import { Recentfavorates } from '../recentfavorates/recentfavorates.model';
-import { Recipe } from '../Recipes/Recipes.model';
+import { RecentlyViewed, Recipe } from '../Recipes/Recipes.model';
 import { User } from '../user/user.model';
 
 const totalUserFromDB = async () => {
@@ -95,57 +95,53 @@ const totalRecipeFromDB = async () => {
 }
 
 const totalRecommendationRecipeFromDB = async () => {
-    // Get the current year
     const currentYear = new Date().getFullYear();
 
-    // Query to find recipes with rating >= 4 for the current year
-    const result = await rating.aggregate([
+    const result = await RecentlyViewed.aggregate([
         {
             $match: {
-                rating: { $gte: 4 },
                 createdAt: {
-                    $gte: new Date(`${currentYear}-01-01`), // Start of the current year
-                    $lt: new Date(`${currentYear + 1}-01-01`), // Start of the next year
-                },
-            },
+                    $gte: new Date(`${currentYear}-01-01T00:00:00.000Z`),
+                    $lte: new Date(`${currentYear}-12-31T23:59:59.999Z`)
+                }
+            }
         },
         {
             $group: {
-                _id: { $month: "$createdAt" }, // Group by month (1-12)
-                totalRecommendations: { $sum: 1 }, // Count the total recommendations for each month
-            },
+                _id: {
+                    month: { $month: "$createdAt" }
+                },
+                uniqueUsers: { $addToSet: "$userId" }
+            }
         },
         {
-            $sort: { _id: 1 }, // Sort by month (ascending order)
+            $project: {
+                _id: 0,
+                month: "$_id.month",
+                totalUsers: { $size: "$uniqueUsers" }
+            }
         },
+        {
+            $sort: { month: 1 }
+        }
     ]);
 
-    // If no results are found, return an empty array
-    if (!result || result.length === 0) {
-        return [];
-    }
-
-    // Month names (this array corresponds to the months in the year)
     const months = [
-        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
 
-    // Process the result to ensure we have all months from Jan to Dec
-    const monthlyData = new Array(12).fill(0); // Array to store the data for all months (0 for missing months)
-    result.forEach((data) => {
-        monthlyData[data._id - 1] = data.totalRecommendations; // Map the result to the correct month
-    });
-
-    // Return the processed data with month names included
-    const monthDataWithNames = months.map((month, index) => {
+    const formattedResult = months.map((month, index) => {
+        const found = result.find(item => item.month === index + 1);
         return {
-            month: month,
-            recommendations: monthlyData[index]
+            month,
+            totalUsers: found ? found.totalUsers : 0
         };
     });
 
-    return monthDataWithNames; // Return the data
+    return formattedResult;
 };
+
 
 
 
@@ -158,7 +154,7 @@ const RecentViewRecipeFromDB = async () => {
 
     const totalCount = await rating.countDocuments({
         rating: { $gte: 4 }
-    });  // This gives you the correct total count of recipes
+    });
 
     if (!result || result.length === 0) {
         return {

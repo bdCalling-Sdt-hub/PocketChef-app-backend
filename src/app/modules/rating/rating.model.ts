@@ -20,6 +20,9 @@ const ratingSchema = new Schema<IRating, ratingModel>({
     ref: 'recipe',
     required: true,
   }
-});
+},
+  {
+    timestamps: true,
+  });
 
 export const rating = model<IRating, ratingModel>('rating', ratingSchema);
