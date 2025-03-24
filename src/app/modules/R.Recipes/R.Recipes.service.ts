@@ -23,8 +23,27 @@ const updateRequestRecipeZodSchema = async (id: string, payload: Partial<IReques
     return result;
 }
 
+const getAllRequestRecipe = async () => {
+    const result = await RequestRecipe.find({})
+    if (!result) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to get all request recipe')
+    }
+    return result
+}
+
+const getSingleRequestRecipe = async (id: string) => {
+    const result = await RequestRecipe.findById(id)
+    if (!result) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to get single request recipe')
+    }
+    return result
+}
+
+
 
 export const RequestRecipeService = {
     createRequestRecipe,
-    updateRequestRecipeZodSchema
+    updateRequestRecipeZodSchema,
+    getAllRequestRecipe,
+    getSingleRequestRecipe
 }

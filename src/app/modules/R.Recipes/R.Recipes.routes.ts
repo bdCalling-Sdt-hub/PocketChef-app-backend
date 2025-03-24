@@ -10,6 +10,9 @@ const route = Router();
 route.post("/create", auth(USER_ROLES.USER), validateRequest(RequestRecipeValidation.createRequestRecipeZodSchema), RequestRecipeController.createRequestRecipe)
 // update route
 route.patch("/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), validateRequest(RequestRecipeValidation.updateRequestRecipeZodSchema), RequestRecipeController.updateRequestRecipe)
-
+// get all route
+route.get("/", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RequestRecipeController.getAllRequestRecipe)
+// get single route
+route.get("/:id", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RequestRecipeController.getSingleRequestRecipe)
 // export route
 export const RequestRecipeRoutes = route
