@@ -95,17 +95,59 @@ const totalRecipeFromDB = async () => {
 }
 
 const totalRecommendationRecipeFromDB = async () => {
-    const result = await rating.find({
-        rating: { $gte: 4 }
-    })
-        .sort({ takeCount: -1 })  // Sort by 'takeCount' in descending order to show most taken recipes
-        .limit(4);  // Limit to the top 4 recipes
+    // Get the current year
+    const currentYear = new Date().getFullYear();
 
+    // Query to find recipes with rating >= 4 for the current year
+    const result = await rating.aggregate([
+        {
+            $match: {
+                rating: { $gte: 4 },
+                createdAt: {
+                    $gte: new Date(`${currentYear}-01-01`), // Start of the current year
+                    $lt: new Date(`${currentYear + 1}-01-01`), // Start of the next year
+                },
+            },
+        },
+        {
+            $group: {
+                _id: { $month: "$createdAt" }, // Group by month (1-12)
+                totalRecommendations: { $sum: 1 }, // Count the total recommendations for each month
+            },
+        },
+        {
+            $sort: { _id: 1 }, // Sort by month (ascending order)
+        },
+    ]);
+
+    // If no results are found, return an empty array
     if (!result || result.length === 0) {
-        return []
+        return [];
     }
-    return result;
-}
+
+    // Month names (this array corresponds to the months in the year)
+    const months = [
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    ];
+
+    // Process the result to ensure we have all months from Jan to Dec
+    const monthlyData = new Array(12).fill(0); // Array to store the data for all months (0 for missing months)
+    result.forEach((data) => {
+        monthlyData[data._id - 1] = data.totalRecommendations; // Map the result to the correct month
+    });
+
+    // Return the processed data with month names included
+    const monthDataWithNames = months.map((month, index) => {
+        return {
+            month: month,
+            recommendations: monthlyData[index]
+        };
+    });
+
+    return monthDataWithNames; // Return the data
+};
+
+
 
 
 const RecentViewRecipeFromDB = async () => {

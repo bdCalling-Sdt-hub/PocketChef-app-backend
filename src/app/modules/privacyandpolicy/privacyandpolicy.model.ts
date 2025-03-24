@@ -2,12 +2,8 @@ import { Schema, model } from 'mongoose';
 import { IPrivacyandpolicy, PrivacyandpolicyModel } from './privacyandpolicy.interface';
 
 const privacyandpolicySchema = new Schema<IPrivacyandpolicy, PrivacyandpolicyModel>({
-  // Define schema fields here
-  question: {
-    type: String,
-    required: true
-  },
-  answer: {
+
+  description: {
     type: String,
     required: true
   }

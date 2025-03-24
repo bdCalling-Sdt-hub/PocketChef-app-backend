@@ -4,6 +4,9 @@ import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import { JwtPayload } from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import ApiError from '../../../errors/ApiErrors';
+import { Favorite } from './favorite.model';
 
 
 const createFavorite = catchAsync(async (req: Request, res: Response) => {
@@ -59,8 +62,8 @@ const updateFavorite = catchAsync(async (req: Request, res: Response) => {
 })
 
 const deleteFavorite = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params
-    const result = await FavoriteServices.deleteFavoriteIntoDB(id)
+    const { _id } = req.params
+    const result = await FavoriteServices.deleteFavoriteIntoDB(_id)
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
@@ -69,4 +72,43 @@ const deleteFavorite = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
-export const FavoriteController = { createFavorite, getAllFavorite, getSingleFavorite, updateFavorite, deleteFavorite };
+
+const getRecentFavorite = catchAsync(async (req: Request, res: Response) => {
+    // No need to pass an ID in the query for recent favorites
+    const recentFavorites = await FavoriteServices.getRecentFavoriteFromDB();
+
+    // Format the response if needed
+    const formattedFavorites = recentFavorites.map(fav => {
+        return {
+            _id: fav._id,
+            recipeId: fav.recipeId,
+            userId: fav.userId,
+            folderName: fav.folderName,
+            // @ts-ignore
+            createdAt: fav.createdAt,
+            // @ts-ignore
+            updatedAt: fav.updatedAt,
+        };
+    });
+
+    // Send the response
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Recent favorites fetched successfully',
+        data: formattedFavorites,
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+export const FavoriteController = { createFavorite, getAllFavorite, getSingleFavorite, updateFavorite, deleteFavorite, getRecentFavorite };

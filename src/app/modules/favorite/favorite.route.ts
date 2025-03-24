@@ -11,4 +11,9 @@ router.get('/:id', auth(USER_ROLES.USER, USER_ROLES.ADMIN), FavoriteController.g
 router.patch('/:id', auth(USER_ROLES.USER, USER_ROLES.ADMIN), FavoriteController.updateFavorite);
 router.delete('/:id', auth(USER_ROLES.USER, USER_ROLES.ADMIN), FavoriteController.deleteFavorite);
 
+// recent favorite
+router.get('/new-recent-favorite', FavoriteController.getRecentFavorite);
+
+
+
 export const FavoriteRoutes = router;

@@ -56,7 +56,7 @@ const RecentViewRecipe = catchAsync(async (req: Request, res: Response) => {
         Total: result.Total,
         statusCode: 200,
         message: 'Recent View Recipe fetched successfully',
-        data: result.result
+        data: result
     })
 })
 

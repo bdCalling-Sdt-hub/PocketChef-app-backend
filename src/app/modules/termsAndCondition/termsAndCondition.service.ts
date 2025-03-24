@@ -4,6 +4,7 @@ import { ITermsAndCondition } from "./termsAndCondition.interface";
 import { termsAndConditionModel } from "./termsAndCondition.model";
 
 const createTermsAndCondition = async (payload: ITermsAndCondition): Promise<ITermsAndCondition> => {
+    await termsAndConditionModel.deleteMany({});
     const termsAndCondition = await termsAndConditionModel.create(payload);
     if (!termsAndCondition) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to created Terms and Condition');

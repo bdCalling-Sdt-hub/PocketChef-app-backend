@@ -12,6 +12,12 @@ const requestRecipes = new Schema<IRequestRecipes>(
             type: String,
             required: true
         },
+        status: {
+            type: String,
+            required: false,
+            enum: ["pending", "approved"],
+            default: "pending"
+        }
     },
     {
         timestamps: true
