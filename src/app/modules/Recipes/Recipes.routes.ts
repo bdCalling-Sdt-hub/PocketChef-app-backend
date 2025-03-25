@@ -60,7 +60,7 @@ router.get("/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMI
 
 // delete recipe route
 
-router.delete("/:id", RecipeController.deleteRecipe);
+router.delete("/:id", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RecipeController.deleteRecipe);
 
 
 

@@ -91,8 +91,8 @@ const updateProfileToDB = async (user: IUser, updateData: any) => {
 };
 
 
-const verifyOtp = async (email: string, otp: number): Promise<boolean> => {
-    const user = await User.findOne({ email }).select('authentication'); // Select the authentication field
+const verifyOtp = async (email: string, otp: number): Promise<any> => {
+    const user = await User.findOne({ email }).select('authentication');
 
     if (!user) {
         throw new ApiError(StatusCodes.NOT_FOUND, "User not found!");
