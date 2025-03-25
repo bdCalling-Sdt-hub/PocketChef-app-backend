@@ -61,6 +61,23 @@ const getSingleRequestRecipe = catchAsync(async (req: Request, res: Response) =>
     })
 })
 
+// get single recipe request by user id
+const getSingleRecipeRequestByUserId = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const result = await RequestRecipeService.getSingleRecipeRequestByUserId(userId);
+
+    if (!result || result.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "No recipe requests found for this user id");
+    }
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Recipe requests fetched successfully by user id",
+        data: result,
+    });
+});
+
 
 
 // export function to get all request recipes
@@ -68,5 +85,6 @@ export const RequestRecipeController = {
     createRequestRecipe,
     updateRequestRecipe,
     getAllRequestRecipe,
-    getSingleRequestRecipe
+    getSingleRequestRecipe,
+    getSingleRecipeRequestByUserId
 }

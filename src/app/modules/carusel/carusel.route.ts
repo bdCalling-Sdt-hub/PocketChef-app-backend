@@ -4,6 +4,8 @@ import validateRequest from '../../middlewares/validateRequest';
 import { CaruselValidations } from './carusel.validation';
 import fileUploadHandler from '../../middlewares/fileUploaderHandler';
 import { getSingleFilePath } from '../../../shared/getFilePath';
+import { USER_ROLES } from '../../../enums/user';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 router.post("/",
@@ -31,8 +33,8 @@ router.post("/",
     validateRequest(CaruselValidations.createCaruselZodSchema), CaruselController.createCarusel);
 router.get('/', CaruselController.getAllCarusel);
 
-
-
+// delete carusel
+router.delete('/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CaruselController.deleteCarusel);
 
 
 export const CaruselRoutes = router;

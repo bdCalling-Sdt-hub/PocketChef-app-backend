@@ -123,14 +123,37 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
     if (date > isExistUser.authentication?.expireAt) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'OTP has expired, please try again');
     }
+    let message;
+    let data;
+    if (!isExistUser.verified) {
+        await User.findOneAndUpdate(
+            { _id: isExistUser._id },
+            { verified: true, authentication: { oneTimeCode: null, expireAt: null } }
+        );
+        message = 'Email verify successfully';
+    } else {
+        await User.findOneAndUpdate(
+            { _id: isExistUser._id },
+            {
+                authentication: {
+                    isResetPassword: true,
+                    oneTimeCode: null,
+                    expireAt: null,
+                }
+            }
+        );
 
-    // If OTP is valid, mark the user as verified and clear OTP
-    await User.findByIdAndUpdate(isExistUser._id, {
-        verified: true,
-        authentication: { oneTimeCode: null, expireAt: null }
-    });
-
-    return { message: 'Email verified successfully!' };
+        //create token ;
+        const createToken = cryptoToken();
+        await ResetToken.create({
+            user: isExistUser._id,
+            token: createToken,
+            expireAt: new Date(Date.now() + 5 * 60000),
+        });
+        message = 'Verification Successful: Please securely store and utilize this code for reset password';
+        data = createToken;
+    }
+    return { data, message };
 };
 
 
@@ -138,7 +161,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
 //forget password
 const resetPasswordToDB = async (token: string, payload: IAuthResetPassword) => {
 
-    const { newPassword } = payload;
+    const { newPassword, confirmPassword } = payload;
 
     //isExist token
     const isExistToken = await ResetToken.isExistToken(token);

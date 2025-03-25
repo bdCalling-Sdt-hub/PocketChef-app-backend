@@ -30,6 +30,22 @@ const getAllCarusel = catchAsync(async (req: Request, res: Response) => {
         data: result
     })
 });
+
+
+const deleteCarusel = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await CaruselServices.deleteCaruselFromDB(id);
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Carusel deleted successfully',
+        data: result
+    })
+});
+
+
 export const CaruselController = {
-    createCarusel, getAllCarusel
+    createCarusel,
+    getAllCarusel,
+    deleteCarusel
 };

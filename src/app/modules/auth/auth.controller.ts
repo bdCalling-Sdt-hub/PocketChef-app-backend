@@ -49,8 +49,11 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const token = req.headers.authorization;
-    const { ...resetData } = req.body;
-    const result = await AuthService.resetPasswordToDB(token!, resetData);
+    if (!token) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Token is required');
+    }
+    const { newPassword, confirmPassword } = req.body;
+    const result = await AuthService.resetPasswordToDB(token!, { newPassword, confirmPassword });
 
     sendResponse(res, {
         success: true,

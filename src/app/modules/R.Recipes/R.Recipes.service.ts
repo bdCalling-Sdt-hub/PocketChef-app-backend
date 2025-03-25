@@ -24,7 +24,8 @@ const updateRequestRecipeZodSchema = async (id: string, payload: Partial<IReques
 }
 
 const getAllRequestRecipe = async () => {
-    const result = await RequestRecipe.find({})
+    const result = await RequestRecipe.find({}).populate("userId", "name email profile")
+    console.log("Result", result);
     if (!result) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to get all request recipe')
     }
@@ -39,11 +40,21 @@ const getSingleRequestRecipe = async (id: string) => {
     return result
 }
 
+// get single recipe request by user id
+const getSingleRecipeRequestByUserId = async (userId: string) => {
+    const result = await RequestRecipe.find({ userId }).populate("userId")
+    if (!result || result.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'No recipe requests found for this user id')
+    }
+    return result
+}
+
 
 
 export const RequestRecipeService = {
     createRequestRecipe,
     updateRequestRecipeZodSchema,
     getAllRequestRecipe,
-    getSingleRequestRecipe
+    getSingleRequestRecipe,
+    getSingleRecipeRequestByUserId
 }

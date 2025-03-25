@@ -49,7 +49,7 @@ router.post(
 
 router.post(
     '/reset-password',
-    auth(USER_ROLES.USER, USER_ROLES.ADMIN),
+    // auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
     validateRequest(AuthValidation.createResetPasswordZodSchema),
     AuthController.resetPassword
 );
@@ -105,7 +105,7 @@ router.get("/users",
 router.get("/user/:id", AuthController.getSingleUser);
 // ban user 
 router.patch('/ban/:id',
-    auth(USER_ROLES.SUPER_ADMIN),
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
     AuthController.banUser);
 
 

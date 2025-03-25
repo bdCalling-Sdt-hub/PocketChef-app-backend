@@ -19,7 +19,16 @@ const getAllCaruselFromDB = async (): Promise<ICarusel[]> => {
     return result;
 }
 
+const deleteCaruselFromDB = async (id: string) => {
+    const result = await Carusel.findByIdAndDelete(id);
+    if (!result) {
+        throw new ApiError(400, 'Failed to delete carusel');
+    }
+    return result;
+}
+
 export const CaruselServices = {
     createCaruselIntoDB,
-    getAllCaruselFromDB
+    getAllCaruselFromDB,
+    deleteCaruselFromDB
 };

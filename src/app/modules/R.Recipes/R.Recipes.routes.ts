@@ -14,5 +14,7 @@ route.patch("/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADM
 route.get("/", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RequestRecipeController.getAllRequestRecipe)
 // get single route
 route.get("/:id", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RequestRecipeController.getSingleRequestRecipe)
+// get single recipe request by user id
+route.get("/user/:userId", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RequestRecipeController.getSingleRecipeRequestByUserId)
 // export route
 export const RequestRecipeRoutes = route

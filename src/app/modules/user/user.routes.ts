@@ -47,4 +47,8 @@ router
         UserController.updateProfile
     );
 router.route("/verify-otp").post(UserController.verifyOtp);
+
+
+router.route("/:id").get(UserController.getSingleUser)
+
 export const UserRoutes = router;

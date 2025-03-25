@@ -97,10 +97,21 @@ const verifyOtp = catchAsync(async (req: Request, res: Response) => {
 
 
 
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await UserService.getSingleUserFromDB(id);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "User fetched successfully",
+        data: result,
+    });
+});
 export const UserController = {
     createUser,
     createAdmin,
     getUserProfile,
     updateProfile,
-    verifyOtp
+    verifyOtp,
+    getSingleUser
 };

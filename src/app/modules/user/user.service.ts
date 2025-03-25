@@ -128,10 +128,20 @@ const verifyOtp = async (email: string, otp: number): Promise<boolean> => {
 };
 
 
+const getSingleUserFromDB = async (id: string) => {
+    const result = await User.findById(id)
+    if (!result) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User not found")
+    }
+    return result
+}
+
+
 export const UserService = {
     createUserToDB,
     getUserProfileFromDB,
     updateProfileToDB,
     createAdminToDB,
-    verifyOtp
+    verifyOtp,
+    getSingleUserFromDB
 };
